@@ -1,0 +1,17 @@
+{
+  "name": "redux-decorated",
+  "version": "1.0.0",
+  "description": "Create a redux store through decorated class",
+  "main": "index.js",
+  "repository": "https://github.com/jindra12/redux-decorated.git",
+  "author": "Jan Jindráček",
+  "license": "MIT",
+  "man": ["./README.md"],
+  "keywords": ["redux", "decorator", "decorators", "library", "simple", "simplified", "decorated"],
+  "dependencies": {
+    "redux": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/redux": "^3.6.0"
+  }
+}

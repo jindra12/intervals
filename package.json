@@ -1,0 +1,24 @@
+{
+  "name": "redux-decorated-dev",
+  "version": "1.0.0",
+  "description": "Redux library for url management",
+  "main": "./dist/index.js",
+  "repository": "https://github.com/jindra12/redux-decorated.git",
+  "author": "Jan Jindráček",
+  "license": "MIT",
+  "scripts": {
+    "build": "rm ./dist/index.js ./dist/index.d.ts; rm -rf ./dist/store; rm -rf ./dist/utils; yarn tsc"
+  },
+  "devDependencies": {
+    "@types/redux": "^3.6.0",
+    "@types/reflect-metadata": "^0.1.0",
+    "redux": "^4.0.5",
+    "reflect-metadata": "^0.1.13",
+    "tslint": "^6.1.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/redux-thunk": "^2.1.0",
+    "redux-thunk": "^2.3.0"
+  }
+}
