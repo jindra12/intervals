@@ -48,14 +48,14 @@ describe("Can manipulate numeric intervals", () => {
         expect(interval(2, 5).isInside(interval(2, 5))).toBe(true);
     });
     test("Interval comparison, overlap: 0, greater: 1, lesser: -1", () => {
-        expect(interval(6, 7).compare(interval(2, 5))).toBe(-1);
+        expect(interval(6, 7).compare(interval(2, 5))).toBe(1);
         expect(interval(2, 5).compare(interval(3, 10))).toBe(0);
         expect(interval(2, 5).compare(interval(5, 10))).toBe(0);
-        expect(interval(2, 5).compare(interval(6, 7))).toBe(1);
+        expect(interval(2, 5).compare(interval(6, 7))).toBe(-1);
     });
-    /*test("Sorts and fills in gaps between intervals", () => {
+    test("Sorts and fills in gaps between intervals", () => {
         expect(
             interval(2, 5, i => i + 2).fillIn([interval(6, 8), interval(-3, -1)]).array()
-        ).toEqual([-3, -2, -1, 1, 3, 5, 6, 7, 8]);
-    });*/
+        ).toEqual([-3, -2, -1, 1, 3, 5, 7, 8]);
+    });
 });

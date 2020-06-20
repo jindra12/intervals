@@ -105,7 +105,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
         };
         interval.overlap = nextInterval => interval.has(nextInterval.start) || interval.has(nextInterval.end);
         interval.isInside = nextInterval => moreOrEqual(interval.start, nextInterval.start) && lessOrEqual(interval.end, nextInterval.end);
-        interval.compare = nextInterval => interval.overlap(nextInterval) ? 0 : lessOrEqual(interval.start, nextInterval.start) ? -1 : 1;
+        interval.compare = nextInterval => interval.overlap(nextInterval) ? 0 : (less(interval.start, nextInterval.start) ? -1 : 1);
         interval.copy = () => generalInterval(interval.start, interval.end, interval.usedNext);
         interval.fillIn = intervals => {
             if (!intervals || intervals.length === 0) {
