@@ -12,9 +12,17 @@ export interface Interval<T = number> {
      */
     end: T;
     /**
+     * Are all iterations exhausted?
+     */
+    isDone: boolean;
+    /**
      * Create another interval
      */
     (start: T, end?: T, next?: (current: T) => T): Interval<T>;
+    /**
+     * Are all iterations exhausted?
+     */    
+    done: () => boolean;
     /**
      * Move iterator
      */

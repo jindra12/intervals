@@ -6,12 +6,11 @@ export interface Comparable {
 }
 
 export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (a: T, b: T) => boolean, infinity: any) => {
-    const min = (a?: T, b?: T) => (!a || !b) ? getInfinity(a, b) : (isLessThan(a, b) ? a : b);
-    const max = (a?: T, b?: T) => (!a || !b) ? getNotInfinity(a, b) : isLessThan(a, b) ? b : a;
-    const less = (a?: T, b?: T) => (!a || !b) ? infinityIsMore(a, b, false) : isLessThan(a, b);
-    const lessOrEqual = (a?: T, b?: T) => (!a || !b) ? infinityIsMore(b, a, true) : isLessThan(a, b) || equals(a, b);
-    const more = (a?: T, b?: T) => (!a || !b) ? infinityIsMore(b, a, false) : isLessThan(b, a);
-    const moreOrEqual = (a?: T, b?: T) => (!a || !b) ? infinityIsMore(b, a, true) : isLessThan(b, a) || equals(a, b);
+    const min = (a: T, b: T) => hasInfinity(a, b) ? getInfinity(a, b) : (isLessThan(a, b) ? a : b);
+    const max = (a: T, b: T) => hasInfinity(a, b) ? getNotInfinity(a, b) : isLessThan(a, b) ? b : a;
+    const less = (a: T, b: T) => hasInfinity(a, b) ? infinityIsMore(a, b, false) : isLessThan(a, b);
+    const lessOrEqual = (a: T, b: T) => hasInfinity(a, b) ? infinityIsMore(a, b, true) : (isLessThan(a, b) || equals(a, b));
+    const moreOrEqual = (a: T, b: T) => hasInfinity(a, b) ? infinityIsMore(b, a, true) : (isLessThan(b, a) || equals(a, b));
     const getInfinity = (a: any, b: any) => a === infinity ? a : b;
     const getNotInfinity = (a: any, b: any) => a === infinity ? b : a;
     const infinityIsMore = (a: any, b: any, equal: boolean) => {
@@ -23,28 +22,16 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
         }
         return true;
     };
-
-    const createIterator = (interval: Interval<T>, next: (iterator: T) => T) => (iterator: number) => {
-        if (iterator <= 0) {
-            return interval;
-        }
-        if (!equals(interval.end, interval.current)) {
-            const nextValue = next(interval.current);
-            if (less(interval.end, nextValue)) {
-                return interval;
-            } 
-            interval.current = nextValue;
-            return interval.it(iterator--);
-        }
-        return interval; 
-    };
+    const hasInfinity = (a: T, b: T) => (a === infinity || b === infinity);
     
-    const concatNext = (...interval: Array<Interval<T>>): ((current: T) => T) => (current: T) => {
-        const owner = interval.find(i => i.has(current));
-        if (!owner) {
-            return current;
+    const concatNext = (...intervals: Array<Interval<T>>) => (current: T) => {
+        const owners = intervals.filter(i => i.has(current));
+
+        if (owners.length === 0) {
+            return infinity;
         }
-        return owner.usedNext(current);
+
+        return owners[owners.length - 1].usedNext(current);
     };
 
     const generalInterval = (start: T, end: T, next: (current: T) => T): Interval<T> => {
@@ -60,43 +47,65 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             if (next) {
                 interval.usedNext = next;
             }
+            interval.isDone = false;
             return interval;
         };
+        interval.isDone = false;
+        interval.done = () => interval.isDone;
         interval.usedNext = next;
         interval.start = start;
         interval.current = start;
         interval.end = end;
-        interval.it = createIterator(interval, next);
+        interval.it = (iterator: number) => {
+            if (iterator <= 0) {
+                return interval;
+            }
+            if (lessOrEqual(interval.current, interval.end)) {
+                const nextValue = interval.usedNext(interval.current);
+                if (less(interval.end, nextValue)) {
+                    interval.isDone = true;
+                    return interval;
+                } 
+                interval.current = nextValue;
+                return interval.it(iterator - 1);
+            }
+            interval.isDone = true;
+            return interval; 
+        };
         interval.next = () => interval.it(1);
         interval.val = () => interval.current;
         interval.concat = nextInterval => {
             if (!interval.overlap(nextInterval)) {
                 return [interval, nextInterval];
             }
-            return [generalInterval(min(interval.start, nextInterval.start), max(interval.end, nextInterval.end), concatNext(interval, nextInterval))];
+            return [generalInterval(
+                min(interval.start, nextInterval.start),
+                max(interval.end, nextInterval.end),
+                less(interval.end, nextInterval.end) ? concatNext(interval, nextInterval) : concatNext(nextInterval, interval),
+            )];
         };
-        interval.has = value => moreOrEqual(value, interval.start) && less(value, interval.end);
+        interval.has = value => moreOrEqual(value, interval.start) && lessOrEqual(value, interval.end);
         interval.diff = nextInterval => {
             if (!interval.overlap(nextInterval)) {
                 return [interval];
             }
             if (lessOrEqual(interval.start, nextInterval.start) && lessOrEqual(interval.end, nextInterval.end)) {
-                return [generalInterval(interval.start, nextInterval.end, concatNext(interval, nextInterval))];
+                return [generalInterval(interval.start, nextInterval.start, interval.usedNext)];
             }
             if (moreOrEqual(interval.start, nextInterval.start) && moreOrEqual(interval.end, nextInterval.end)) {
-                return [generalInterval(nextInterval.start, interval.end, concatNext(interval, nextInterval))];
+                return [generalInterval(nextInterval.end, interval.end, interval.usedNext)];
             }
             if (interval.isInside(nextInterval)) {
                 return [];
             }
             return [
                 generalInterval(interval.start, nextInterval.start, interval.usedNext),
-                generalInterval(interval.end, nextInterval.end, nextInterval.usedNext),
+                generalInterval(nextInterval.end, interval.end, interval.usedNext),
             ];
         };
         interval.overlap = nextInterval => interval.has(nextInterval.start) || interval.has(nextInterval.end);
-        interval.isInside = nextInterval => more(interval.start, nextInterval.start) && lessOrEqual(interval.end, nextInterval.end);
-        interval.compare = nextInterval => interval.overlap(nextInterval) ? 0 : less(interval.start, nextInterval.start) ? -1 : 1;
+        interval.isInside = nextInterval => moreOrEqual(interval.start, nextInterval.start) && lessOrEqual(interval.end, nextInterval.end);
+        interval.compare = nextInterval => interval.overlap(nextInterval) ? 0 : lessOrEqual(interval.start, nextInterval.start) ? -1 : 1;
         interval.copy = () => generalInterval(interval.start, interval.end, interval.usedNext);
         interval.fillIn = intervals => {
             if (!intervals || intervals.length === 0) {
@@ -121,9 +130,11 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             }
             const aggregate: T[] = [interval.val()];
             const copyInterval = interval.copy();
-            while (copyInterval.current !== copyInterval.end) {
+            while (!copyInterval.done()) {
                 copyInterval.next();
-                aggregate.push(copyInterval.val());
+                if (!copyInterval.done()) {
+                    aggregate.push(copyInterval.val());
+                }
             }
             return aggregate;
         };

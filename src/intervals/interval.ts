@@ -46,7 +46,7 @@ export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, ne
             case 'function':
                 throw Error('Function or bigint are not correct types for interval');
             case 'number':
-                return numberInterval(start, (end as number) || Infinity, next as any || (current => current++)) as any;
+                return numberInterval(start, (end as number) || Infinity, next as any || (current => current + 1)) as any;
             case 'symbol':
             case 'string':
                 return stringInterval(start.toString(), (end as any) || null, next as any || (current => `${current}${current}`)) as any;
