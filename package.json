@@ -10,15 +10,12 @@
     "build": "rm ./dist/index.js ./dist/index.d.ts; rm -rf ./dist/store; rm -rf ./dist/utils; yarn tsc"
   },
   "devDependencies": {
-    "@types/redux": "^3.6.0",
-    "@types/reflect-metadata": "^0.1.0",
-    "redux": "^4.0.5",
-    "reflect-metadata": "^0.1.13",
+    "@types/jest": "^26.0.0",
+    "jest": "^26.0.1",
     "tslint": "^6.1.2",
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@types/redux-thunk": "^2.1.0",
-    "redux-thunk": "^2.3.0"
+    "ts-jest": "^26.1.0"
   }
 }

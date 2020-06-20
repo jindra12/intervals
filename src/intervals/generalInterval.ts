@@ -12,7 +12,6 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
     const lessOrEqual = (a?: T, b?: T) => (!a || !b) ? infinityIsMore(b, a, true) : isLessThan(a, b) || equals(a, b);
     const more = (a?: T, b?: T) => (!a || !b) ? infinityIsMore(b, a, false) : isLessThan(b, a);
     const moreOrEqual = (a?: T, b?: T) => (!a || !b) ? infinityIsMore(b, a, true) : isLessThan(b, a) || equals(a, b);
-    const equalWithInfinity = (a?: T, b?: T) => (!a || !b) ? a === b : equals(a, b);
     const getInfinity = (a: any, b: any) => a === infinity ? a : b;
     const getNotInfinity = (a: any, b: any) => a === infinity ? b : a;
     const infinityIsMore = (a: any, b: any, equal: boolean) => {
@@ -103,9 +102,10 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             if (!intervals || intervals.length === 0) {
                 return interval;
             }
-            let filler = intervals[0];
-            for (let i = 0; i < intervals.length; i++) {
-                const at = intervals[i];
+            const sorted = interval.sort(intervals);
+            let filler = sorted[0];
+            for (let i = 0; i < sorted.length; i++) {
+                const at = sorted[i];
                 if (moreOrEqual(filler.end, at.start)) {
                     filler = filler.concat(at)[0];
                 } else {

@@ -73,6 +73,9 @@ export interface Interval<T = number> {
     sort: (intervals: Array<Interval<T>>) => Array<Interval<T>>;
 }
 
+/**
+ * Comparison interface, needs to be implemented in order for object intervals to work
+ */
 export interface Comparable {
     equals: <T extends Comparable>(item: T) => boolean;
     isLessThan: <T extends Comparable>(item: T) => boolean;
