@@ -1,17 +1,15 @@
 {
-  "name": "redux-decorated",
+  "name": "interval-management",
   "version": "1.0.0",
-  "description": "Create a redux store through decorated class",
+  "description": "No dependency interval management library, able to work with numbers, string, Dates or special objects",
   "main": "index.js",
-  "repository": "https://github.com/jindra12/redux-decorated.git",
+  "repository": "https://github.com/jindra12/intervals.git",
   "author": "Jan Jindráček",
   "license": "MIT",
   "man": ["./README.md"],
-  "keywords": ["redux", "decorator", "decorators", "library", "simple", "simplified", "decorated"],
+  "keywords": ["interval", "intervals", "management", "library", "number", "string", "Date", "utility"],
   "dependencies": {
-    "redux": "^4.0.5"
   },
   "devDependencies": {
-    "@types/redux": "^3.6.0"
   }
 }

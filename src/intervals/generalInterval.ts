@@ -35,6 +35,10 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
     };
 
     const generalInterval = (start: T, end: T, next: (current: T) => T): Interval<T> => {
+        if (end !== infinity && isLessThan(end, start)) {
+            throw new Error('End of interval cannot come before start');
+        }
+
         const interval: Interval<T> = (start: T, end?: T, next?: (iterator: T) => T) => {
             if (!start) {
                 return interval;
