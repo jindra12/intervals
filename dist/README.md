@@ -49,6 +49,27 @@ If you set undefined/Infinity on 'end' parameter of interval function, the inter
 Interval function does not have a sanity check for infinite generation (generator function never reaching end parameter).
 Type of interval will be decided based on 'typeof' and 'instance of' (for Date).
 
+Another important feature is the Comparable interface. If you need a custom object iterated over, you can do it like this:
+
+```typescript
+
+class TestData implements Comparable<TestData> {
+    public date: Date;
+    constructor(date: Date) {
+        this.date = date;
+    }
+    public isLessThan = (test: TestData) => this.date.getTime() < test.date.getTime();
+    public equals = (test: TestData) => this.date.getTime() === test.date.getTime();
+    public byHour = () => new TestData(this.byHourImpl(this.date));
+    private byHourImpl = (date: Date) => {
+        const next = new Date(date);
+        next.setHours(date.getHours() + 1);
+        return next;
+    };
+}
+
+```
+
 This library does NOT allow you to:
 
 1) Use array() for an explicitly infinite interval
