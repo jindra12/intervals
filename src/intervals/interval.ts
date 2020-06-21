@@ -4,7 +4,7 @@ import { stringInterval } from "./stringInterval";
 import { objectInterval } from "./objectInterval";
 import { dateInterval } from "./dateInterval";
 
-type AllowedTypes = string | number | symbol | Comparable | boolean;
+type AllowedTypes = string | number | symbol | Comparable<any> | Date | boolean;
 type IntervalType<T> = T extends number 
     ? Interval<number> 
     : (
@@ -14,8 +14,8 @@ type IntervalType<T> = T extends number
                 T extends Date
                     ? Interval<Date>
                     : (
-                        T extends Comparable
-                            ? Interval<Comparable>
+                        T extends Comparable<T>
+                            ? Interval<Comparable<T>>
                             : never
                     )
             )
@@ -29,8 +29,8 @@ type GeneralizedType<T> = T extends number
                 T extends Date
                     ? Date
                     : (
-                        T extends Comparable
-                            ? Comparable
+                        T extends Comparable<T>
+                            ? (T & Comparable<T>)
                             : never
                     )
             )
@@ -57,9 +57,9 @@ export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, ne
                 if (!next) {
                     throw Error('Cannot create non-date object interval without knowing how to generate next item');
                 }
-                return objectInterval(start as Comparable, (end as any) || null, next as any) as any;
+                return objectInterval(start as Comparable<any>, (end as any) || null, next as any) as any;
             case 'boolean':
-                return numberInterval(start ? 1 : 0, (end as any) || 1, next as any || (_ => 1)) as any;
+                return numberInterval(start as number, (end as any) || true, next as any || (_ => true)) as any;
         }
     }
 

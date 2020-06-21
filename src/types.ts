@@ -84,7 +84,7 @@ export interface Interval<T = number> {
 /**
  * Comparison interface, needs to be implemented in order for object intervals to work
  */
-export interface Comparable {
-    equals: <T extends Comparable>(item: T) => boolean;
-    isLessThan: <T extends Comparable>(item: T) => boolean;
+export interface Comparable<T> {
+    equals: (item: T) => boolean;
+    isLessThan: (item: T) => boolean;
 }
