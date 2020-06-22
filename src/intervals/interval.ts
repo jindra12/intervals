@@ -40,7 +40,7 @@ export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, ne
     if (!start && !end && !next) {
         return numberInterval(0, Infinity, current => current++) as any;
     }
-    if (start) {
+    if (start || start === 0) {
         switch (typeof start) {
             case 'bigint':
             case 'function':

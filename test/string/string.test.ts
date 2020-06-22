@@ -58,4 +58,9 @@ describe("Can manipulate string intervals", () => {
             interval('b', 'bb', c => c + 'b').fillIn([interval('aa', 'aaa', c => c + 'a'), interval('aaab', 'aaaba', c => c + 'a')]).array()
         ).toEqual(['aa', 'aaa', 'aaab', 'aaaba']);
     });
+    test("Can split a single interval into multiple ones", () => {
+        expect(
+            interval('a', 'aaaa', s => s + 'a').split(c => c !== 'aaa').map(i => i.array())
+        ).toEqual([['a', 'aa', 'aaa'], ['aaa', 'aaaa']]);
+    });
 });

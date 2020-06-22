@@ -123,4 +123,9 @@ describe("Can manipulate custom object intervals intervals", () => {
             interval(comparable1, comparable2, c => byHour(byHour(c))).fillIn([interval(comparable5, comparable6, byHour), interval(comparable8, comparable9, byHour)]).array()
         ).dateEqual( [comparable5, comparable6, comparable8, comparable9]);
     });
+    test("Can split a single interval into multiple ones", () => {
+        expect(
+            interval(comparable5, comparable8, byHour).split(d => !d.equals(comparable7)).map(i => i.array())
+        ).dateEqualMulti([[comparable5, comparable6, comparable7], [comparable7, comparable8]]);
+    });
 });

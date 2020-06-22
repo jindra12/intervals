@@ -74,4 +74,9 @@ describe("Can manipulate date intervals", () => {
             interval(date1, date2, c => byHour(byHour(c))).fillIn([interval(date5, date6, byHour), interval(date8, date9, byHour)]).array()
         ).toEqual([date5, date6, date8, date9]);
     });
+    test("Can split a single interval into multiple ones", () => {
+        expect(
+            interval(date5, date8, byHour).split(d => d.getTime() !== date7.getTime()).map(i => i.array())
+        ).toEqual([[date5, date6, date7], [date7, date8]]);
+    });
 });

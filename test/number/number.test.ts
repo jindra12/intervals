@@ -58,4 +58,9 @@ describe("Can manipulate numeric intervals", () => {
             interval(2, 5, i => i + 2).fillIn([interval(6, 8), interval(-3, -1)]).array()
         ).toEqual([-3, -2, -1, 1, 3, 5, 7, 8]);
     });
+    test("Can split a single interval into multiple ones", () => {
+        expect(
+            interval(0, 15, n => n + 5).split(c => c !== 10).map(i => i.array())
+        ).toEqual([[0, 5, 10], [10, 15]]);
+    });
 });

@@ -79,6 +79,12 @@ export interface Interval<T = number> {
      * Sorts an array of intervals. DOES NOT mutate the original array
      */
     sort: (intervals: Array<Interval<T>>) => Array<Interval<T>>;
+    /**
+     * Splits interval into several smaller ones. Will fail on infinite intervals.
+     * @param by When this function returns false, an interval with 'current' as its end will be created.
+     * Next interval in line will also start with 'current'.
+     */
+    split: (by: (current: T, next: T | null, currentIteration: number) => boolean) => Array<Interval<T>>;
 }
 
 /**

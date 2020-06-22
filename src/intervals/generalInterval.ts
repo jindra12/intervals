@@ -142,6 +142,26 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             }
             return aggregate;
         };
+        interval.split = split => {
+            const intervals: Array<Interval<T>> = [];
+            if (interval.end === infinity) {
+                throw Error('Cannot split infinite interval');
+            }
+            const items = interval.array();
+            let start = items[0];
+            const end = items[items.length - 1];
+            items.forEach((item, i) => {
+                const next = items[i + 1];
+                if (!split(item, next, i)) {
+                    intervals.push(generalInterval(start, item, interval.usedNext));
+                    start = item;
+                }
+                if (i === items.length - 1 && split(item, next, i)) {
+                    intervals.push(generalInterval(start, end, interval.usedNext));
+                }
+            });
+            return intervals;
+        };
         return interval;
     };
 
