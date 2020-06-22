@@ -48,6 +48,12 @@ export interface Interval<T = number> {
      */
     has: (item: T) => boolean;
     /**
+     * Does an array-level search inside the interval. Will fail in case of an infinite interval without end param.
+     * @param compare Can either be a function, which returns a match, or an item of interval
+     * @param end at which element should the search stop?
+     */
+    find: (compare: ((item: T) => boolean) | T, end?: T) => T | null;
+    /**
      * Substracts interval by limits. Can return two intervals
      */
     diff: (interval: Interval<T>) => Interval<T>[];
@@ -90,7 +96,9 @@ export interface Interval<T = number> {
 /**
  * Comparison interface, needs to be implemented in order for object intervals to work
  */
-export interface Comparable<T> {
+interface IComparable<T> {
     equals: (item: T) => boolean;
     isLessThan: (item: T) => boolean;
 }
+
+export type Comparable<T> = T & IComparable<T>;

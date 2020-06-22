@@ -162,6 +162,26 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             });
             return intervals;
         };
+        interval.find = (compare, end) => {
+            if (typeof compare !== 'function' && !interval.has(compare)) {
+                return null;
+            }
+
+            if (!end && (end as any) !== 0 && interval.end === infinity) {
+                throw Error('Cannot seek inside infinite interval without boundary');
+            }
+
+            const trueEnd = (interval.end === infinity || end || end as any === 0) ? end : interval.end;
+            const trueCompare = typeof compare === 'function' ? compare as (item: T) => boolean : (item: T) => equals(item, compare);
+            const copyInterval = generalInterval(interval.start, trueEnd as any, interval.usedNext);
+            while (!copyInterval.done()) {
+                if (trueCompare(copyInterval.val())) {
+                    return copyInterval.val();
+                }
+                copyInterval.next();
+            }
+            return null;
+        };
         return interval;
     };
 

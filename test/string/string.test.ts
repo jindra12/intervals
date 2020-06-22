@@ -63,4 +63,12 @@ describe("Can manipulate string intervals", () => {
             interval('a', 'aaaa', s => s + 'a').split(c => c !== 'aaa').map(i => i.array())
         ).toEqual([['a', 'aa', 'aaa'], ['aaa', 'aaaa']]);
     });
+    test("Can do an array-level interval search", () => {
+        expect(interval('a', 'aaaa', s => s + 'a').find('aa')).toBe('aa');
+        expect(interval('a', 'aaaa', s => s + 'a').find(s => s.length > 3)).toBe('aaaa');
+        expect(interval('a', 'aaaa', s => s + 'a').find('aaaaa')).toBe(null);
+        expect(interval('a', undefined, s => s + 'a').find('aaa', 'aaaa')).toBe('aaa');
+        expect(interval('a', 'aaaa', s => s + 'a').find(s => s.length > 3, 'aa')).toBe(null);
+        expect(interval('a', 'aaaa', s => s + 'a').find('b')).toBe(null);
+    });
 });

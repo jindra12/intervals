@@ -128,4 +128,12 @@ describe("Can manipulate custom object intervals intervals", () => {
             interval(comparable5, comparable8, byHour).split(d => !d.equals(comparable7)).map(i => i.array())
         ).dateEqualMulti([[comparable5, comparable6, comparable7], [comparable7, comparable8]]);
     });
+    test("Can do an array-level interval search", () => {
+        expect(interval(comparable5, comparable8, byHour).find(comparable6)).dateEqualSingle(comparable6);
+        expect(interval(comparable5, comparable8, byHour).find(d => d.date.getFullYear() === 2021)).toEqual(null);
+        expect(interval(comparable5, comparable8, byHour).find(comparable9)).toEqual(null);
+        expect(interval(comparable5, undefined, byHour).find(comparable6, comparable8)).dateEqualSingle(comparable6);
+        expect(interval(comparable5, comparable8, byHour).find(d => d > comparable6, comparable6)).toEqual(null);
+        expect(interval(comparable5, comparable8, byHour).find(comparable1)).toEqual(null);
+    });
 });

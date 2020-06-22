@@ -20,23 +20,8 @@ type IntervalType<T> = T extends number
                     )
             )
     );
-type GeneralizedType<T> = T extends number 
-    ? number
-    : (
-        T extends string
-            ? string
-            : (
-                T extends Date
-                    ? Date
-                    : (
-                        T extends Comparable<T>
-                            ? (T & Comparable<T>)
-                            : never
-                    )
-            )
-    );
 
-export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, next?: (current: GeneralizedType<T>) => GeneralizedType<T>): IntervalType<T> => {
+export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, next?: (current: T) => T): IntervalType<T> => {
     if (!start && !end && !next) {
         return numberInterval(0, Infinity, current => current++) as any;
     }

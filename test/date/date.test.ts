@@ -79,4 +79,12 @@ describe("Can manipulate date intervals", () => {
             interval(date5, date8, byHour).split(d => d.getTime() !== date7.getTime()).map(i => i.array())
         ).toEqual([[date5, date6, date7], [date7, date8]]);
     });
+    test("Can do an array-level interval search", () => {
+        expect(interval(date5, date8, byHour).find(date6)).toEqual(date6);
+        expect(interval(date5, date8, byHour).find(d => d.getFullYear() === 2021)).toEqual(null);
+        expect(interval(date5, date8, byHour).find(date9)).toEqual(null);
+        expect(interval(date5, undefined, byHour).find(date6, date8)).toEqual(date6);
+        expect(interval(date5, date8, byHour).find(d => d > date6, date6)).toEqual(null);
+        expect(interval(date5, date8, byHour).find(date1)).toEqual(null);
+    });
 });
