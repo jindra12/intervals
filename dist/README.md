@@ -70,12 +70,64 @@ class TestData implements Comparable<TestData> {
 
 ```
 
+### Added functionality since 1.4.0:
+
+Interval now supports conversion to another type of interval and infinity-interval compatible functions:
+
+1) map
+2) reduce
+3) forEach
+
+### Unit test examples
+
+```typescript
+
+expect(interval(1, 3, c => c + 1).convert(
+    i => i.toString(), i => (parseInt(i, 10) + 1).toString()
+).array()).toEqual(['1', '2', '3']);
+
+expect(interval(1, 3, c => c + 1).map(c => c.toString())).toEqual(['1', '2', '3']);
+
+expect(interval(1, 3, c => c + 1).reduce((p, c) => p + c, 0)).toBe(6);
+
+let counter = 1;
+interval(1, 3, c => c + 1).forEach(c => {
+    expect(c).toBe(counter);
+    counter++;
+});
+
+expect(interval(1, undefined, c => c + 1).map((c, escape) => {
+    if (c > 2) {
+        escape();
+    }
+    return c.toString();
+})).toEqual(['1', '2', '3']);
+
+expect(interval(1, undefined, c => c + 1).reduce((p, c, escape) => { 
+    if (c > 2) {
+        escape();
+    }
+    return p + c;
+}, 0)).toBe(6);
+
+let infCounter = 1;
+interval(1, undefined, c => c + 1).forEach((c, escape) => {
+    if (c > 2) {
+        escape();
+    }
+    expect(c).toBe(infCounter);
+    infCounter++;
+});
+
+```
+
 This library does NOT allow you to:
 
 1) Use array() for an explicitly infinite interval
 2) Create an object array without next function
 3) Start and end parameters cannot be 'function' or 'bigint'
 4) Creating an interval with 'end' being before 'start'
+5) For an interval to have 'infinite' start
 
 
 If there are any problems, do not hesitate to create an issue or a pull request. Thank you.
