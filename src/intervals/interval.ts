@@ -1,25 +1,8 @@
-import { Comparable, Interval } from "../types";
+import { Comparable, AllowedTypes, IntervalType } from "../types";
 import { numberInterval } from "./numberInterval";
 import { stringInterval } from "./stringInterval";
 import { objectInterval } from "./objectInterval";
 import { dateInterval } from "./dateInterval";
-
-type AllowedTypes = string | number | symbol | Comparable<any> | Date | boolean;
-type IntervalType<T> = T extends number 
-    ? Interval<number> 
-    : (
-        T extends string
-            ? Interval<string>
-            : (
-                T extends Date
-                    ? Interval<Date>
-                    : (
-                        T extends Comparable<T>
-                            ? Interval<Comparable<T>>
-                            : never
-                    )
-            )
-    );
 
 export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, next?: (current: T) => T): IntervalType<T> => {
     if (!start && !end && !next) {

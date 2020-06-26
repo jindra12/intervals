@@ -71,4 +71,12 @@ describe("Can manipulate numeric intervals", () => {
         expect(interval(0, 10, n => n + 2).find(n => n > 5, 3)).toBe(null);
         expect(interval(0, 10, n => n + 2).find(3)).toBe(null);
     });
+    test("Can convert to string", () => {
+        expect(interval(1, 3, c => c + 1).convert(
+            i => i.toString(), i => (parseInt(i, 10) + 1).toString()
+        ).array()).toEqual(['1', '2', '3']);
+        expect(interval(1, undefined, c => c + 1).convert(
+            i => i.toString(), i => (parseInt(i, 10) + 1).toString()
+        ).it(5).val()).toBe('6');
+    });
 });

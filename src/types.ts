@@ -91,6 +91,13 @@ export interface Interval<T = number> {
      * Next interval in line will also start with 'current'.
      */
     split: (by: (current: T, next: T | null, currentIteration: number) => boolean) => Array<Interval<T>>;
+    
+    /**
+     * Returns an interval of type E, with start and end converted
+     * @param to Function, which will be used to convert start, end and next of the interval
+     * @param next How to get next element in line
+     */
+    convert: <E extends AllowedTypes>(to: (value: T) => E, next: (item: E) => E) => Interval<E>;
 }
 
 /**
@@ -99,6 +106,28 @@ export interface Interval<T = number> {
 interface IComparable<T> {
     equals: (item: T) => boolean;
     isLessThan: (item: T) => boolean;
+}
+
+export type AllowedTypes = string | number | symbol | Comparable<any> | Date | boolean;
+export type IntervalType<T> = T extends number 
+    ? Interval<number> 
+    : (
+        T extends string
+            ? Interval<string>
+            : (
+                T extends Date
+                    ? Interval<Date>
+                    : (
+                        T extends Comparable<T>
+                            ? Interval<Comparable<T>>
+                            : never
+                    )
+            )
+    );
+
+export interface InnerComparable {
+    equals: <T extends InnerComparable>(item: T) => boolean;
+    isLessThan: <T extends InnerComparable>(item: T) => boolean;
 }
 
 export type Comparable<T> = T & IComparable<T>;

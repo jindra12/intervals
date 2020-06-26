@@ -136,4 +136,9 @@ describe("Can manipulate custom object intervals intervals", () => {
         expect(interval(comparable5, comparable8, byHour).find(d => d > comparable6, comparable6)).toEqual(null);
         expect(interval(comparable5, comparable8, byHour).find(comparable1)).toEqual(null);
     });
+    test("Can convert to number", () => {
+        expect(interval(comparable5, comparable7, byHour).convert(
+            s => s.date.getTime(), s => s + 1000 * 60 * 60,
+        ).array()).toEqual([comparable5.date.getTime(), comparable6.date.getTime(), comparable7.date.getTime()])
+    });
 });

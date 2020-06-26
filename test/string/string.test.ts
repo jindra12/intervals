@@ -71,4 +71,9 @@ describe("Can manipulate string intervals", () => {
         expect(interval('a', 'aaaa', s => s + 'a').find(s => s.length > 3, 'aa')).toBe(null);
         expect(interval('a', 'aaaa', s => s + 'a').find('b')).toBe(null);
     });
+    test("Can convert to number", () => {
+        expect(interval('a', 'aaa', c => c + 'a').convert(
+            s => s.length, s => s + 1,
+        ).array()).toEqual([1, 2, 3])
+    });
 });

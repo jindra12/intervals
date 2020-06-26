@@ -1,3 +1,4 @@
-import { createInterval, Comparable } from "./generalInterval";
+import { createInterval } from "./generalInterval";
+import { InnerComparable } from "../types";
 
-export const objectInterval = createInterval(<T extends Comparable>(a: T, b: T) => a.equals(b), (a, b) => a.isLessThan(b), null);
+export const objectInterval = createInterval(<T extends InnerComparable>(a: T, b: T) => a.equals(b), (a, b) => a.isLessThan(b), null);

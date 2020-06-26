@@ -1,9 +1,5 @@
-import { Interval } from "../types";
-
-export interface Comparable {
-    equals: <T extends Comparable>(item: T) => boolean;
-    isLessThan: <T extends Comparable>(item: T) => boolean;
-}
+import { Interval, AllowedTypes } from "../types";
+import intervalCreator from "../index";
 
 export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (a: T, b: T) => boolean, infinity: any) => {
     const min = (a: T, b: T) => hasInfinity(a, b) ? getInfinity(a, b) : (isLessThan(a, b) ? a : b);
@@ -34,15 +30,20 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
         return owners[owners.length - 1].usedNext(current);
     };
 
-    const generalInterval = (start: T, end: T, next: (current: T) => T): Interval<T> => {
+    const checkInterval = (start: T, end: T) => {
         if (end !== infinity && isLessThan(end, start)) {
             throw new Error('End of interval cannot come before start');
         }
+        if (start === infinity) {
+            throw new Error('Cannot start the interval at infinity');
+        }
 
+    }
+
+    const generalInterval = (start: T, end: T, next: (current: T) => T): Interval<T> => {
+        checkInterval(start, end);
         const interval: Interval<T> = (start: T, end?: T, next?: (iterator: T) => T) => {
-            if (!start) {
-                return interval;
-            }
+            checkInterval(start, end || infinity);
             interval.start = start;
             interval.current = start;
             if (end) {
@@ -182,6 +183,26 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             }
             return null;
         };
+        interval.convert = <E extends AllowedTypes>(to: (item: T) => E, next: (item: E) => E) => {
+            let nextEnd: any;
+            const nextStart: E = to(interval.start);
+            if (interval.end === infinity) {
+                switch (typeof nextStart) {
+                    case 'number':
+                    case 'boolean':
+                        nextEnd = Infinity;
+                        break;
+                    case 'string':
+                    case 'object':
+                        nextEnd = null;
+                        break;
+                }
+            } else {
+                nextEnd = to(interval.end);
+            }
+
+            return intervalCreator(nextStart, nextEnd, next) as Interval<E>;
+        }
         return interval;
     };
 

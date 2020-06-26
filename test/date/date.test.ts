@@ -87,4 +87,9 @@ describe("Can manipulate date intervals", () => {
         expect(interval(date5, date8, byHour).find(d => d > date6, date6)).toEqual(null);
         expect(interval(date5, date8, byHour).find(date1)).toEqual(null);
     });
+    test("Can convert to number", () => {
+        expect(interval(date5, date7, byHour).convert(
+            s => s.getTime(), s => s + 1000 * 60 * 60,
+        ).array()).toEqual([date5.getTime(), date6.getTime(), date7.getTime()])
+    });
 });
