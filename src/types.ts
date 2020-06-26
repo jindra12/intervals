@@ -98,6 +98,24 @@ export interface Interval<T = number> {
      * @param next How to get next element in line
      */
     convert: <E extends AllowedTypes>(to: (value: T) => E, next: (item: E) => E) => Interval<E>;
+
+    /**
+     * Map function which can deal with infinite intervals. This function does not mutate interval.
+     * @param iterator function which will be used to iterate over interval elements. Escape will end run immediately and return values.
+     */
+    map: <E>(iterator: (value: T, escape: () => void) => E) => E[];
+
+    /**
+     * ForEach function which can deal with infinite intervals. This function does not mutate interval.
+     * @param iterator function which will be used to iterate over interval elements. Escape will end run immediately.
+     */
+    forEach: (iterator: (value: T, escape: () => void) => void) => void;
+
+    /**
+     * Reduce function which can deal with infinite intervals. This function does not mutate interval.
+     * @param iterator function which will be used to iterate over interval elements. Escape will end run immediately and return reduced value.
+     */
+    reduce: <E>(iterator: (previous: E, value: T, escape: () => void) => E, start: E) => E;
 }
 
 /**

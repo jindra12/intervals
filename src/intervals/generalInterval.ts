@@ -203,6 +203,41 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
 
             return intervalCreator(nextStart, nextEnd, next) as Interval<E>;
         }
+
+        const mapper = (inter: Interval<T>, fn: (copied: Interval<T>, stop: () => boolean, escape: () => void) => void) => {
+            let stop = false;
+            const copied = inter.copy();
+            const escape = () => stop = true; 
+            fn(copied, () => stop, escape);
+        }
+        interval.map = <E>(iterator: (value: T, escape: () => void) => E) => {
+            const aggregate: E[] = []; 
+            mapper(interval, (copied, stop, escape) => {
+                while (!copied.done() && !stop()) {
+                    aggregate.push(iterator(copied.val(), escape));
+                    copied.next();
+                }
+            })
+            return aggregate;
+        }
+        interval.forEach = iterator => mapper(
+            interval,
+            (copied, stop, escape) => {
+                while (!copied.done() && !stop()) {
+                    iterator(copied.val(), escape);
+                    copied.next();
+                }
+            });
+        interval.reduce = <E>(iterator: (previous: E, value: T, escape: () => void) => E, start: E) => {
+            let aggregate: E = start; 
+            mapper(interval, (copied, stop, escape) => {
+                while (!copied.done() && !stop()) {
+                    aggregate = iterator(aggregate, copied.val(), escape);
+                    copied.next();
+                }
+            });
+            return aggregate;
+        }
         return interval;
     };
 

@@ -79,4 +79,34 @@ describe("Can manipulate numeric intervals", () => {
             i => i.toString(), i => (parseInt(i, 10) + 1).toString()
         ).it(5).val()).toBe('6');
     });
+    test("Can do a reduce, map and foreach", () => {
+        expect(interval(1, 3, c => c + 1).map(c => c.toString())).toEqual(['1', '2', '3']);
+        expect(interval(1, 3, c => c + 1).reduce((p, c) => p + c, 0)).toBe(6);
+        let counter = 1;
+        interval(1, 3, c => c + 1).forEach(c => {
+            expect(c).toBe(counter);
+            counter++;
+        });
+
+        expect(interval(1, undefined, c => c + 1).map((c, escape) => {
+            if (c > 2) {
+                escape();
+            }
+            return c.toString();
+        })).toEqual(['1', '2', '3']);
+        expect(interval(1, undefined, c => c + 1).reduce((p, c, escape) => { 
+            if (c > 2) {
+                escape();
+            }
+            return p + c;
+        }, 0)).toBe(6);
+        let infCounter = 1;
+        interval(1, undefined, c => c + 1).forEach((c, escape) => {
+            if (c > 2) {
+                escape();
+            }
+            expect(c).toBe(infCounter);
+            infCounter++;
+        });
+    });
 });
