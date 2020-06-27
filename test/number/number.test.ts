@@ -109,4 +109,14 @@ describe("Can manipulate numeric intervals", () => {
             infCounter++;
         });
     });
+    test("Copy/Converted interval will copy current position", () => {
+        expect(interval().it(2).copy().val()).toBe(2);
+        expect(interval(0, 3).it(2).convert(n => n.toString(), s => (parseInt(s, 10) + 1).toString()).val()).toBe('2');
+    });
+    test("Can find the closest values in the interval", () => {
+        expect(interval(2, 4, c => c + 1).closest(3)).toEqual([3]);
+        expect(interval(2, 4, c => c + 1).closest(-1)).toEqual([2]);
+        expect(interval(2, 4, c => c + 1).closest(5)).toEqual([4]);
+        expect(interval(2, 6, c => c + 2).closest(5)).toEqual([4, 6]);
+    });
 });

@@ -116,6 +116,12 @@ export interface Interval<T = number> {
      * @param iterator function which will be used to iterate over interval elements. Escape will end run immediately and return reduced value.
      */
     reduce: <E>(iterator: (previous: E, value: T, escape: () => void) => E, start: E) => E;
+
+    /**
+     * Find equal, one or two closest elements
+     * @param item Item to be found
+     */
+    closest: (item: T) => T[];
 }
 
 /**

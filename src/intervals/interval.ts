@@ -6,7 +6,7 @@ import { dateInterval } from "./dateInterval";
 
 export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, next?: (current: T) => T): IntervalType<T> => {
     if (!start && !end && !next) {
-        return numberInterval(0, Infinity, current => current++) as any;
+        return numberInterval(0, Infinity, current => current + 1) as any;
     }
     if (start || start === 0) {
         switch (typeof start) {

@@ -111,7 +111,11 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
         interval.overlap = nextInterval => interval.has(nextInterval.start) || interval.has(nextInterval.end);
         interval.isInside = nextInterval => nextInterval.has(interval.start) && nextInterval.has(interval.end);
         interval.compare = nextInterval => interval.overlap(nextInterval) ? 0 : (less(interval.start, nextInterval.start) ? -1 : 1);
-        interval.copy = () => generalInterval(interval.start, interval.end, interval.usedNext);
+        interval.copy = () => {
+            const copied = generalInterval(interval.start, interval.end, interval.usedNext);
+            copied.current = interval.current;
+            return copied;
+        };
         interval.fillIn = intervals => {
             if (!intervals || intervals.length === 0) {
                 return interval;
@@ -200,8 +204,9 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             } else {
                 nextEnd = to(interval.end);
             }
-
-            return intervalCreator(nextStart, nextEnd, next) as Interval<E>;
+            const converted = intervalCreator(nextStart, nextEnd, next) as Interval<E>;
+            converted.current = to(interval.current);
+            return converted;
         }
 
         const mapper = (inter: Interval<T>, fn: (copied: Interval<T>, stop: () => boolean, escape: () => void) => void) => {
@@ -237,7 +242,27 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                 }
             });
             return aggregate;
-        }
+        };
+        interval.closest = (item: T) => {
+            if (less(item, interval.start)) {
+                return [interval.start];
+            }
+            if (less(interval.end, item)) {
+                return [interval.end];
+            }
+            const copied = interval.copy();
+            let last: T = interval.start;
+            while(!copied.next().done()) {
+                if (equals(copied.val(), item)) {
+                    return [copied.val()];
+                }
+                if (less(last, item) && less(item, copied.val())) {
+                    return [last, copied.val()];
+                }
+                last = copied.val();
+            }
+            throw Error('Unexpected result of closest function!');
+        };
         return interval;
     };
 
