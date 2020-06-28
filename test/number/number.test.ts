@@ -124,4 +124,10 @@ describe("Can manipulate numeric intervals", () => {
         expect(interval([1, 2, 4, 5]).it(10).val()).toBe(5);
         expect(interval([1, 2, 3, 4]).concat(interval([3, 8, 9, 10]))[0].it(3).val()).toBe(8);
     });
+    test("Can reset an interval", () => {
+        expect(interval([1, 2, 3]).it(2).reset().it(1).val()).toBe(2);
+    });
+    test("Can create an array interval copy", () => {
+        expect(interval(0, 3).deep().it(1).val()).toBe(1);
+    })
 });

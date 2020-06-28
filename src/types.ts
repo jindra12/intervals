@@ -122,6 +122,16 @@ export interface Interval<T = number> {
      * @param item Item to be found
      */
     closest: (item: T) => T[];
+
+    /**
+     * Resets current interval position
+     */
+    reset: () => Interval<T>;
+
+    /**
+     * Returns an array-based interval from the original
+     */
+    deep: () => Interval<T>;
 }
 
 /**

@@ -263,6 +263,11 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             }
             throw Error('Unexpected result of closest function!');
         };
+        interval.reset = () => {
+            interval.current = interval.start;
+            return interval;
+        }
+        interval.deep = () => intervalCreator(interval.array());
         return interval;
     };
 
