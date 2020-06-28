@@ -121,6 +121,31 @@ interval(1, undefined, c => c + 1).forEach((c, escape) => {
 
 ```
 
+### Added functionality since 1.5.0:
+
+Can find closest neighbours of value. Example:
+
+```typescript
+
+expect(interval(2, 4, c => c + 1).closest(3)).toEqual([3]);
+expect(interval(2, 4, c => c + 1).closest(-1)).toEqual([2]);
+expect(interval(2, 4, c => c + 1).closest(5)).toEqual([4]);
+expect(interval(2, 6, c => c + 2).closest(5)).toEqual([4, 6]);
+
+```
+
+### Added functionality since 1.6.0:
+
+Can create an interval out of an array. Example:
+
+```typescript
+
+expect(interval([1, 2, 4, 5]).it(2).val()).toBe(4);
+expect(interval([1, 2, 4, 5]).it(10).val()).toBe(5);
+expect(interval([1, 2, 3, 4]).concat(interval([3, 8, 9, 10]))[0].it(3).val()).toBe(8);
+
+```
+
 This library does NOT allow you to:
 
 1) Use array() for an explicitly infinite interval

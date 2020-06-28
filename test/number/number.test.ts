@@ -119,4 +119,9 @@ describe("Can manipulate numeric intervals", () => {
         expect(interval(2, 4, c => c + 1).closest(5)).toEqual([4]);
         expect(interval(2, 6, c => c + 2).closest(5)).toEqual([4, 6]);
     });
+    test("Can create interval out of an array", () => {
+        expect(interval([1, 2, 4, 5]).it(2).val()).toBe(4);
+        expect(interval([1, 2, 4, 5]).it(10).val()).toBe(5);
+        expect(interval([1, 2, 3, 4]).concat(interval([3, 8, 9, 10]))[0].it(3).val()).toBe(8);
+    });
 });

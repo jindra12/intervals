@@ -144,7 +144,11 @@ export type IntervalType<T> = T extends number
                     : (
                         T extends Comparable<T>
                             ? Interval<Comparable<T>>
-                            : never
+                            : (
+                                T extends (infer U)[]
+                                    ? Interval<U>
+                                    : never
+                            )
                     )
             )
     );

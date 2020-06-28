@@ -8,6 +8,23 @@ export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, ne
     if (!start && !end && !next) {
         return numberInterval(0, Infinity, current => current + 1) as any;
     }
+    if (Array.isArray(start) && start.length > 0 && !end && !next) {
+        const mappedIndex: { [key: string]: number } = {};
+        start.forEach((value, i) => {
+            mappedIndex[JSON.stringify(value)] = i;
+        });
+        return interval(
+            start[0],
+            start[start.length - 1],
+            value => {
+                const currentIndex = mappedIndex[JSON.stringify(value)];
+                if ((!currentIndex && currentIndex !== 0) || currentIndex === start.length - 1) {
+                    return start[start.length - 1];
+                }
+                return start[currentIndex + 1];
+            },
+        ) as any;
+    }
     if (start || start === 0) {
         switch (typeof start) {
             case 'bigint':
