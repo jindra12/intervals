@@ -61,7 +61,7 @@ describe("Can manipulate string intervals", () => {
     test("Can split a single interval into multiple ones", () => {
         expect(
             interval('a', 'aaaa', s => s + 'a').split(c => c !== 'aaa').map(i => i.array())
-        ).toEqual([['a', 'aa', 'aaa'], ['aaa', 'aaaa']]);
+        ).toEqual([['a', 'aa', 'aaa'], ['aaaa']]);
     });
     test("Can do an array-level interval search", () => {
         expect(interval('a', 'aaaa', s => s + 'a').find('aa')).toBe('aa');

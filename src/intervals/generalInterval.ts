@@ -159,7 +159,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                 const next = items[i + 1];
                 if (!split(item, next, i)) {
                     intervals.push(generalInterval(start, item, interval.usedNext));
-                    start = item;
+                    start = next;
                 }
                 if (i === items.length - 1 && split(item, next, i)) {
                     intervals.push(generalInterval(start, end, interval.usedNext));

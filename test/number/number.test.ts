@@ -61,7 +61,7 @@ describe("Can manipulate numeric intervals", () => {
     test("Can split a single interval into multiple ones", () => {
         expect(
             interval(0, 15, n => n + 5).split(c => c !== 10).map(i => i.array())
-        ).toEqual([[0, 5, 10], [10, 15]]);
+        ).toEqual([[0, 5, 10], [15]]);
     });
     test("Can do an array-level interval search", () => {
         expect(interval(0, 10, n => n + 2).find(2)).toBe(2);

@@ -125,8 +125,8 @@ describe("Can manipulate custom object intervals intervals", () => {
     });
     test("Can split a single interval into multiple ones", () => {
         expect(
-            interval(comparable5, comparable8, byHour).split(d => !d.equals(comparable7)).map(i => i.array())
-        ).dateEqualMulti([[comparable5, comparable6, comparable7], [comparable7, comparable8]]);
+            interval(comparable5, comparable8, byHour).split(d => !d.equals(comparable6)).map(i => i.array())
+        ).dateEqualMulti([[comparable5, comparable6], [comparable7, comparable8]]);
     });
     test("Can do an array-level interval search", () => {
         expect(interval(comparable5, comparable8, byHour).find(comparable6)).dateEqualSingle(comparable6);
