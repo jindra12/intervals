@@ -129,14 +129,22 @@ export interface Interval<T = number> {
     reset: () => Interval<T>;
 
     /**
-     * Returns an array-based interval from the original
+     * Returns an array-based interval from the original.
+     * Will not work on infinite intervals.
      */
     deep: () => Interval<T>;
 
     /**
      * Splits an interval into multiple groups then returns a map of arrays of intervals based on classification
+     * Will not work on infinite intervals
      */
     classify: <E extends string>(classify: (item: T) => E) => ({ [K in E]: Interval<T>[] });
+
+    /**
+     * Does an deep-level merge. Similar to concat, except that this method will merge individual elements of the two intervals.
+     * Will not work on infinite intervals
+     */
+    merge: (int: Interval<T>) => Interval<T>;
 }
 
 /**

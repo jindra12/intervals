@@ -298,6 +298,12 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             });
             return map as { [K in E]: Array<Interval<T>> };
         };
+        interval.merge = int => intervalCreator(
+            [
+                ...interval.array(),
+                ...int.array(),
+            ].sort((a, b) => equals(a, b) ? 0 : (less(a, b) ? -1 : 1))
+        ) as any;
         return interval;
     };
 

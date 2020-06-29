@@ -134,4 +134,7 @@ describe("Can manipulate numeric intervals", () => {
     test("Can classify intervals based on custom criteria", () => {
         expect(interval([1, 2, 3, 4, 5, 6]).classify(n => n % 2 ? 'odd' : 'even')['odd'][0].array()).toEqual([1]);
     });
+    test("Can merge items of two intervals together", () => {
+        expect(interval([1, 3, 4]).merge(interval([-1, 2, 5])).array()).toEqual([-1, 1, 2, 3, 4, 5]);
+    })
 });
