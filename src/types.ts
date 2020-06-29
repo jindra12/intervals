@@ -90,7 +90,7 @@ export interface Interval<T = number> {
      * @param by When this function returns false, an interval with 'current' as its end will be created.
      * Next interval in line will also start with 'current'.
      */
-    split: (by: (current: T, next: T | null, currentIteration: number) => boolean) => Array<Interval<T>>;
+    split: (by: (current: T, next: T, currentIteration: number) => boolean) => Array<Interval<T>>;
     
     /**
      * Returns an interval of type E, with start and end converted
@@ -132,6 +132,11 @@ export interface Interval<T = number> {
      * Returns an array-based interval from the original
      */
     deep: () => Interval<T>;
+
+    /**
+     * Splits an interval into multiple groups then returns a map of arrays of intervals based on classification
+     */
+    classify: <E extends string>(classify: (item: T) => E) => ({ [K in E]: Interval<T>[] });
 }
 
 /**

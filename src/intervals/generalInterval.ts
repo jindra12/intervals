@@ -65,17 +65,26 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             if (iterator <= 0) {
                 return interval;
             }
-            if (lessOrEqual(interval.current, interval.end)) {
+            if (less(interval.current, interval.end)) {
                 const nextValue = interval.usedNext(interval.current);
+                if (less(nextValue, interval.end)) {
+                    interval.current = nextValue;
+                    return interval.it(iterator - 1);
+                }
+                if (equals(nextValue, interval.end)) {
+                    interval.current = nextValue;
+                    return interval;
+                }
                 if (less(interval.end, nextValue)) {
                     interval.isDone = true;
                     return interval;
-                } 
-                interval.current = nextValue;
-                return interval.it(iterator - 1);
+                }
             }
-            interval.isDone = true;
-            return interval; 
+            if (equals(interval.current, interval.end)) {
+                interval.isDone = true;
+                return interval;
+            }
+            throw Error('Iterator sanity check failed!');
         };
         interval.next = () => interval.it(1);
         interval.val = () => interval.current;
@@ -137,13 +146,11 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             if (interval.end === infinity) {
                 throw Error('Cannot count to Infinity!');
             }
-            const aggregate: T[] = [interval.val()];
+            const aggregate: T[] = [];
             const copyInterval = interval.copy();
             while (!copyInterval.done()) {
+                aggregate.push(copyInterval.val());
                 copyInterval.next();
-                if (!copyInterval.done()) {
-                    aggregate.push(copyInterval.val());
-                }
             }
             return aggregate;
         };
@@ -161,7 +168,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                     intervals.push(generalInterval(start, item, interval.usedNext));
                     start = next;
                 }
-                if (i === items.length - 1 && split(item, next, i)) {
+                if (i === items.length - 1) {
                     intervals.push(generalInterval(start, end, interval.usedNext));
                 }
             });
@@ -218,9 +225,12 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
         interval.map = <E>(iterator: (value: T, escape: () => void) => E) => {
             const aggregate: E[] = []; 
             mapper(interval, (copied, stop, escape) => {
-                while (!copied.done() && !stop()) {
+                while (!stop()) {
                     aggregate.push(iterator(copied.val(), escape));
                     copied.next();
+                    if (copied.done()) {
+                        break;
+                    }
                 }
             })
             return aggregate;
@@ -250,24 +260,44 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             if (less(interval.end, item)) {
                 return [interval.end];
             }
-            const copied = interval.copy();
             let last: T = interval.start;
-            while(!copied.next().done()) {
-                if (equals(copied.val(), item)) {
-                    return [copied.val()];
+            let toReturn: T[] = [];
+            mapper(interval, (copied, stop, escape) => {
+                while (!copied.done() && !stop()) {
+                    if (equals(copied.val(), item)) {
+                        escape();
+                        toReturn = [copied.val()];
+                    }
+                    if (less(last, item) && less(item, copied.val())) {
+                        escape();
+                        toReturn = [last, copied.val()];
+                    }
+                    last = copied.val();
+                    copied.next();
                 }
-                if (less(last, item) && less(item, copied.val())) {
-                    return [last, copied.val()];
-                }
-                last = copied.val();
+            });
+            if (toReturn.length === 0) {
+                throw Error('Unexpected result of closest function');
             }
-            throw Error('Unexpected result of closest function!');
+            return toReturn;
         };
         interval.reset = () => {
             interval.current = interval.start;
             return interval;
         }
         interval.deep = () => intervalCreator(interval.array());
+        interval.classify = <E extends string>(classify: (item: T) => E) => {
+            const split = interval.split((current, next) => classify(current) === classify(next));
+            const map: { [key: string]: Array<Interval<T>> } = {};
+            split.forEach(int => {
+                const index = classify(int.start);
+                if (!map[index]) {
+                    map[index] = [];
+                }
+                map[index].push(int);
+            });
+            return map as { [K in E]: Array<Interval<T>> };
+        };
         return interval;
     };
 

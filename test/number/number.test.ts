@@ -123,11 +123,15 @@ describe("Can manipulate numeric intervals", () => {
         expect(interval([1, 2, 4, 5]).it(2).val()).toBe(4);
         expect(interval([1, 2, 4, 5]).it(10).val()).toBe(5);
         expect(interval([1, 2, 3, 4]).concat(interval([3, 8, 9, 10]))[0].it(3).val()).toBe(8);
+        expect(interval([1, 2, 3]).array()).toEqual([1, 2, 3]);
     });
     test("Can reset an interval", () => {
         expect(interval([1, 2, 3]).it(2).reset().it(1).val()).toBe(2);
     });
     test("Can create an array interval copy", () => {
         expect(interval(0, 3).deep().it(1).val()).toBe(1);
-    })
+    });
+    test("Can classify intervals based on custom criteria", () => {
+        expect(interval([1, 2, 3, 4, 5, 6]).classify(n => n % 2 ? 'odd' : 'even')['odd'][0].array()).toEqual([1]);
+    });
 });
