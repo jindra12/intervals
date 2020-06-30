@@ -20,14 +20,15 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
     };
     const hasInfinity = (a: T, b: T) => (a === infinity || b === infinity);
     
-    const concatNext = (...intervals: Array<Interval<T>>) => (current: T) => {
-        const owners = intervals.filter(i => i.has(current));
-
-        if (owners.length === 0) {
-            return infinity;
+    const concatNext = (a: Interval<T>, b: Interval<T>) => (current: T) => {
+        if (b.has(current)) {
+            return b.usedNext(current);
+        } else if (a.has(current)) {
+            return a.usedNext(current);
+        } else if (less(a.end, current) && less(current, b.start)) {
+            return b.start
         }
-
-        return owners[owners.length - 1].usedNext(current);
+        return b.end;
     };
 
     const checkInterval = (start: T, end: T) => {
@@ -88,34 +89,36 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
         };
         interval.next = () => interval.it(1);
         interval.val = () => interval.current;
-        interval.concat = nextInterval => {
-            if (!interval.overlap(nextInterval)) {
-                return [interval, nextInterval];
-            }
-            return [generalInterval(
-                min(interval.start, nextInterval.start),
-                max(interval.end, nextInterval.end),
-                less(interval.end, nextInterval.end) ? concatNext(interval, nextInterval) : concatNext(nextInterval, interval),
-            )];
-        };
+        interval.concat = nextInterval => generalInterval(
+            min(interval.start, nextInterval.start),
+            max(interval.end, nextInterval.end),
+            less(interval.end, nextInterval.end) 
+                ? concatNext(interval, nextInterval)
+                : concatNext(nextInterval, interval),
+        );
         interval.has = value => moreOrEqual(value, interval.start) && lessOrEqual(value, interval.end);
         interval.diff = nextInterval => {
             if (!interval.overlap(nextInterval)) {
-                return [interval];
+                return interval;
             }
             if (lessOrEqual(interval.start, nextInterval.start) && lessOrEqual(interval.end, nextInterval.end)) {
-                return [generalInterval(interval.start, nextInterval.start, interval.usedNext)];
+                return generalInterval(interval.start, nextInterval.start, interval.usedNext);
             }
             if (moreOrEqual(interval.start, nextInterval.start) && moreOrEqual(interval.end, nextInterval.end)) {
-                return [generalInterval(nextInterval.end, interval.end, interval.usedNext)];
+                return generalInterval(nextInterval.end, interval.end, interval.usedNext);
             }
             if (interval.isInside(nextInterval)) {
-                return [];
+                return null;
             }
-            return [
-                generalInterval(interval.start, nextInterval.start, interval.usedNext),
-                generalInterval(nextInterval.end, interval.end, interval.usedNext),
-            ];
+            return generalInterval(interval.start, interval.end, next => {
+                if (less(next, nextInterval.start)) {
+                    return interval.usedNext(next);
+                }
+                if (lessOrEqual(nextInterval.end, next)) {
+                    return interval.usedNext(next);
+                }
+                return nextInterval.end;
+            });
         };
         interval.overlap = nextInterval => interval.has(nextInterval.start) || interval.has(nextInterval.end);
         interval.isInside = nextInterval => nextInterval.has(interval.start) && nextInterval.has(interval.end);
@@ -134,9 +137,9 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             for (let i = 0; i < sorted.length; i++) {
                 const at = sorted[i];
                 if (moreOrEqual(filler.end, at.start)) {
-                    filler = filler.concat(at)[0];
+                    filler = filler.concat(at);
                 } else {
-                    filler = filler.concat(interval(filler.end, at.start, interval.usedNext).concat(at)[0])[0]
+                    filler = filler.concat(interval(filler.end, at.start, interval.usedNext).concat(at));
                 }
             }
             return filler;

@@ -85,16 +85,16 @@ describe("Can manipulate custom object intervals intervals", () => {
         expect(interval(comparable1, comparable4, byHour).has(comparable2)).toBe(true);
         expect(interval(comparable1, comparable4, byHour).has(comparable5)).toBe(false);
     });
-    test("Substracts interval by limits. Can return two intervals", () => {
-        expect(interval(comparable1, comparable6, byHour).diff(interval(comparable1, comparable5, byHour))[0].array()).dateEqual([comparable5, comparable6]);
-        expect(interval(comparable1, comparable2, byHour).diff(interval(comparable3, comparable4, byHour))[0].array()).dateEqual([comparable1, comparable2]);
-        expect(interval(comparable1, comparable6, byHour).diff(interval(comparable2, comparable5, byHour)).map(i => i.array())).dateEqualMulti([[comparable1, comparable2], [comparable5, comparable6]]);
+    test("Substracts interval by limits", () => {
+        expect(interval(comparable1, comparable6, byHour).diff(interval(comparable1, comparable5, byHour))?.array()).dateEqual([comparable5, comparable6]);
+        expect(interval(comparable1, comparable2, byHour).diff(interval(comparable3, comparable4, byHour))?.array()).dateEqual([comparable1, comparable2]);
+        expect(interval(comparable1, comparable6, byHour).diff(interval(comparable2, comparable5, byHour))?.array()).dateEqual([comparable1, comparable2, comparable5, comparable6]);
     });
-    test("Concats two intervals. In non-overlapping cases, returns back both intervals", () => {
-        expect(interval(comparable5, comparable7, byHour).concat(interval(comparable6, comparable8, byHour))[0].array()).dateEqual([comparable5, comparable6, comparable7, comparable8]);
-        expect(interval(comparable5, comparable6, byHour).concat(interval(comparable6, comparable7, byHour))[0].array()).dateEqual([comparable5, comparable6, comparable7]);
-        expect(interval(comparable5, comparable6, byHour).concat(interval(comparable6, comparable8, c => byHour(byHour(c))))[0].array()).dateEqual([comparable5, comparable6, comparable8]);
-        expect(interval(comparable5, comparable6, byHour).concat(interval(comparable7, comparable8, byHour)).map(i => i.array())).dateEqualMulti([[comparable5, comparable6], [comparable7, comparable8]]);
+    test("Concats two intervals", () => {
+        expect(interval(comparable5, comparable7, byHour).concat(interval(comparable6, comparable8, byHour)).array()).dateEqual([comparable5, comparable6, comparable7, comparable8]);
+        expect(interval(comparable5, comparable6, byHour).concat(interval(comparable6, comparable7, byHour)).array()).dateEqual([comparable5, comparable6, comparable7]);
+        expect(interval(comparable5, comparable6, byHour).concat(interval(comparable6, comparable8, c => byHour(byHour(c)))).array()).dateEqual([comparable5, comparable6, comparable8]);
+        expect(interval(comparable5, comparable6, byHour).concat(interval(comparable7, comparable8, byHour)).array()).dateEqual([comparable5, comparable6, comparable7, comparable8]);
     });
     test("Creates copy", () => {
         const i = interval(comparable1, comparable2, byHour);

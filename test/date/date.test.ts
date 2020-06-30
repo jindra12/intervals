@@ -36,16 +36,16 @@ describe("Can manipulate date intervals", () => {
         expect(interval(date1, date4).has(date2)).toBe(true);
         expect(interval(date1, date4).has(date5)).toBe(false);
     });
-    test("Substracts interval by limits. Can return two intervals", () => {
-        expect(interval(date1, date6, byHour).diff(interval(date1, date5))[0].array()).toEqual([date5, date6]);
-        expect(interval(date1, date2, byHour).diff(interval(date3, date4))[0].array()).toEqual([date1, date2]);
-        expect(interval(date1, date6, byHour).diff(interval(date2, date5)).map(i => i.array())).toEqual([[date1, date2], [date5, date6]]);
+    test("Substracts interval by limits", () => {
+        expect(interval(date1, date6, byHour).diff(interval(date1, date5))?.array()).toEqual([date5, date6]);
+        expect(interval(date1, date2, byHour).diff(interval(date3, date4))?.array()).toEqual([date1, date2]);
+        expect(interval(date1, date6, byHour).diff(interval(date2, date5))?.array()).toEqual([date1, date2, date5, date6]);
     });
-    test("Concats two intervals. In non-overlapping cases, returns back both intervals", () => {
-        expect(interval(date5, date7, byHour).concat(interval(date6, date8, byHour))[0].array()).toEqual([date5, date6, date7, date8]);
-        expect(interval(date5, date6, byHour).concat(interval(date6, date7, byHour))[0].array()).toEqual([date5, date6, date7]);
-        expect(interval(date5, date6, byHour).concat(interval(date6, date8, c => byHour(byHour(c))))[0].array()).toEqual([date5, date6, date8]);
-        expect(interval(date5, date6, byHour).concat(interval(date7, date8, byHour)).map(i => i.array())).toEqual([[date5, date6], [date7, date8]]);
+    test("Concats two intervals", () => {
+        expect(interval(date5, date7, byHour).concat(interval(date6, date8, byHour)).array()).toEqual([date5, date6, date7, date8]);
+        expect(interval(date5, date6, byHour).concat(interval(date6, date7, byHour)).array()).toEqual([date5, date6, date7]);
+        expect(interval(date5, date6, byHour).concat(interval(date6, date8, c => byHour(byHour(c)))).array()).toEqual([date5, date6, date8]);
+        expect(interval(date5, date6, byHour).concat(interval(date7, date8, byHour)).array()).toEqual([date5, date6, date7, date8]);
     });
     test("Creates copy", () => {
         const i = interval(date1, date2, byHour);

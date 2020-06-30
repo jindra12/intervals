@@ -20,16 +20,16 @@ describe("Can manipulate string intervals", () => {
         expect(interval('a', 'aa').has('a')).toBe(true);
         expect(interval('a', 'aaa').has('b')).toBe(false);
     });
-    test("Substracts interval by limits. Can return two intervals", () => {
-        expect(interval('a', 'aaaaa').diff(interval('aa', 'aaaaa'))[0].array()).toEqual(['a', 'aa']);
-        expect(interval('a', 'aa').diff(interval('aaa', 'aaaa'))[0].array()).toEqual(['a', 'aa']);
-        expect(interval('a', 'aaaaaa', c => c + 'a').diff(interval('aa', 'aaaa')).map(i => i.array())).toEqual([['a', 'aa'], ['aaaa', 'aaaaa', 'aaaaaa']]);
+    test("Substracts interval by limits", () => {
+        expect(interval('a', 'aaaaa').diff(interval('aa', 'aaaaa'))?.array()).toEqual(['a', 'aa']);
+        expect(interval('a', 'aa').diff(interval('aaa', 'aaaa'))?.array()).toEqual(['a', 'aa']);
+        expect(interval('a', 'aaaaaa', c => c + 'a').diff(interval('aa', 'aaaa'))?.array()).toEqual(['a', 'aa', 'aaaa', 'aaaaa', 'aaaaaa']);
     });
-    test("Concats two intervals. In non-overlapping cases, returns back both intervals", () => {
-        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aa', 'aaaa', c => c + 'a'))[0].array()).toEqual(['a', 'aa', 'aaa', 'aaaa']);
-        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aaa', 'aaaa', c => c + 'a'))[0].array()).toEqual(['a', 'aa', 'aaa', 'aaaa']);
-        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aaa', 'aaab', c => c + 'b'))[0].array()).toEqual(['a', 'aa', 'aaa', 'aaab']);
-        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aaaa', 'aaaaa', c => c + 'a')).map(i => i.array())).toEqual([['a', 'aa', 'aaa'], ['aaaa', 'aaaaa']]);
+    test("Concats two intervals", () => {
+        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aa', 'aaaa', c => c + 'a')).array()).toEqual(['a', 'aa', 'aaa', 'aaaa']);
+        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aaa', 'aaaa', c => c + 'a')).array()).toEqual(['a', 'aa', 'aaa', 'aaaa']);
+        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aaa', 'aaab', c => c + 'b')).array()).toEqual(['a', 'aa', 'aaa', 'aaab']);
+        expect(interval('a', 'aaa', c => c + 'a').concat(interval('aaaa', 'aaaaa', c => c + 'a')).array()).toEqual(['a', 'aa', 'aaa', 'aaaa', 'aaaaa']);
     });
     test("Creates copy", () => {
         const i = interval(1, 5, c => c + 3);
