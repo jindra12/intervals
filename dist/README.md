@@ -150,6 +150,10 @@ expect(interval([1, 2, 3, 4]).concat(interval([3, 8, 9, 10]))[0].it(3).val()).to
 
 Concat and diff functions now return only one interval (in case of diff it can be null if diffing an interval with one that completely overlaps it).
 
+### Changes since 2.1.0:
+
+Convert function can now be created without explicitly defining 'next' function. This will however fail on infinite intervals.
+
 This library does NOT allow you to:
 
 1) Use array() for an explicitly infinite interval

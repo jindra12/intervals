@@ -80,6 +80,7 @@ describe("Can manipulate numeric intervals", () => {
         expect(interval(1, undefined, c => c + 1).convert(
             i => i.toString(), i => (parseInt(i, 10) + 1).toString()
         ).it(5).val()).toBe('6');
+        expect(interval([1, 2, 3]).convert(n => n.toString()).array()).toEqual(['1', '2', '3']);
     });
     test("Can do a reduce, map and foreach", () => {
         expect(interval(1, 3, c => c + 1).map(c => c.toString())).toEqual(['1', '2', '3']);

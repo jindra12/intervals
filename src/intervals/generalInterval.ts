@@ -197,7 +197,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             }
             return null;
         };
-        interval.convert = <E extends AllowedTypes>(to: (item: T) => E, next: (item: E) => E) => {
+        interval.convert = <E extends AllowedTypes>(to: (item: T) => E, next?: (item: E) => E) => {
             let nextEnd: any;
             const nextStart: E = to(interval.start);
             if (interval.end === infinity) {
@@ -213,6 +213,12 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                 }
             } else {
                 nextEnd = to(interval.end);
+            }
+            if (!next) {
+                if (equals(nextEnd, infinity)) {
+                    throw Error('Cannot convert an infinite interval without next function');
+                }
+                return intervalCreator(interval.array().map(to));
             }
             const converted = intervalCreator(nextStart, nextEnd, next) as Interval<E>;
             converted.current = to(interval.current);

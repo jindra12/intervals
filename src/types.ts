@@ -117,7 +117,7 @@ export interface Interval<T = number> {
      * @param to Function, which will be used to convert start, end and next of the interval
      * @param next How to get next element in line
      */
-    convert: <E extends AllowedTypes>(to: (value: T) => E, next: (item: E) => E) => Interval<E>;
+    convert: <E extends AllowedTypes>(to: (value: T) => E, next?: (item: E) => E) => Interval<E>;
 
     /**
      * Map function which can deal with infinite intervals. This function does not mutate interval.
