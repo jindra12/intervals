@@ -161,6 +161,7 @@ This library does NOT allow you to:
 3) Start and end parameters cannot be 'function' or 'bigint'
 4) Creating an interval with 'end' being before 'start'
 5) For an interval to have 'infinite' start
+6) Define an array-like interval with values which serialize to the same string
 
 
 If there are any problems, do not hesitate to create an issue or a pull request. Thank you.

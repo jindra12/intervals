@@ -11,6 +11,9 @@ export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, ne
     if (Array.isArray(start) && start.length > 0 && !end && !next) {
         const mappedIndex: { [key: string]: number } = {};
         start.forEach((value, i) => {
+            if (mappedIndex[JSON.stringify(value)] !== undefined) {
+                throw Error('Cannot define array-like interval with two equal (as JSON.stringify) values!');
+            }
             mappedIndex[JSON.stringify(value)] = i;
         });
         return interval(

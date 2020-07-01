@@ -139,5 +139,5 @@ describe("Can manipulate numeric intervals", () => {
     });
     test("Can merge items of two intervals together", () => {
         expect(interval([1, 3, 4]).merge(interval([-1, 2, 5])).array()).toEqual([-1, 1, 2, 3, 4, 5]);
-    })
+    });
 });
