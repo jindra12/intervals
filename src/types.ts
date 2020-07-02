@@ -67,6 +67,14 @@ export interface Interval<T = number> {
     find: (compare: ((item: T) => boolean) | T, end?: T) => T | null;
 
     /**
+     * Does an array-level search inside the interval. Will fail in case of an infinite interval without end param.
+     * Will return all elements matching.
+     * @param compare Can either be a function, which returns a match, or an item of interval
+     * @param end at which element should the search stop?
+     */
+    all:  (compare: ((item: T) => boolean) | T, end?: T) => T[];
+
+    /**
      * Substracts interval by limits. Returns null if interval is inside the diffing one
      */
     diff: (interval: Interval<T>) => Interval<T> | null;

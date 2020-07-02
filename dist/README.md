@@ -154,6 +154,11 @@ Concat and diff functions now return only one interval (in case of diff it can b
 
 Convert function can now be created without explicitly defining 'next' function. This will however fail on infinite intervals.
 
+### Changes since 2.2.0:
+
+Next to a find function you can now find 'all'. Function will return an array of all elements matching a certain pattern.
+Will fail, similarly to 'find', if you apply it on an infinite interval without an 'end' item to finish the search.
+
 This library does NOT allow you to:
 
 1) Use array() for an explicitly infinite interval

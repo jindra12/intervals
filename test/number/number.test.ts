@@ -140,4 +140,9 @@ describe("Can manipulate numeric intervals", () => {
     test("Can merge items of two intervals together", () => {
         expect(interval([1, 3, 4]).merge(interval([-1, 2, 5])).array()).toEqual([-1, 1, 2, 3, 4, 5]);
     });
+    test("Can find all items matching a pattern", () => {
+        expect(interval([1, 2, 3, 4]).all(i => i < 3)).toEqual([1, 2]);
+        expect(interval([1, 2, 3, 4]).all(3)).toEqual([3]);
+        expect(interval(1, Infinity).all(i => i < 10, 5)).toEqual([1, 2, 3, 4, 5]);
+    });
 });

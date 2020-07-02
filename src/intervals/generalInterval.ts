@@ -177,11 +177,10 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             });
             return intervals;
         };
-        interval.find = (compare, end) => {
-            if (typeof compare !== 'function' && !interval.has(compare)) {
-                return null;
-            }
-
+        const findHelper = (
+            compare: T | ((item: T) => boolean),
+            end?: T,
+        ) => {
             if (!end && (end as any) !== 0 && interval.end === infinity) {
                 throw Error('Cannot seek inside infinite interval without boundary');
             }
@@ -189,6 +188,16 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             const trueEnd = (interval.end === infinity || end || end as any === 0) ? end : interval.end;
             const trueCompare = typeof compare === 'function' ? compare as (item: T) => boolean : (item: T) => equals(item, compare);
             const copyInterval = generalInterval(interval.start, trueEnd as any, interval.usedNext);
+            return {
+                trueCompare,
+                copyInterval,
+            };
+        };
+        interval.find = (compare, end) => {
+            if (typeof compare !== 'function' && !interval.has(compare)) {
+                return null;
+            }
+            const { trueCompare, copyInterval } = findHelper(compare, end);
             while (!copyInterval.done()) {
                 if (trueCompare(copyInterval.val())) {
                     return copyInterval.val();
@@ -196,6 +205,20 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                 copyInterval.next();
             }
             return null;
+        };
+        interval.all = (compare, end) => {
+            if (typeof compare !== 'function' && !interval.has(compare)) {
+                return [];
+            }
+            const { trueCompare, copyInterval } = findHelper(compare, end);
+            const aggregate: T[] = [];
+            while (!copyInterval.done()) {
+                if (trueCompare(copyInterval.val())) {
+                    aggregate.push(copyInterval.val());
+                }
+                copyInterval.next();
+            }
+            return aggregate;
         };
         interval.convert = <E extends AllowedTypes>(to: (item: T) => E, next?: (item: E) => E) => {
             let nextEnd: any;
