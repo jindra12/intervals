@@ -1,9 +1,9 @@
 {
-  "name": "redux-decorated-dev",
+  "name": "interval-management-dev",
   "version": "1.0.0",
-  "description": "Redux library for url management",
+  "description": "Intervals dev package",
   "main": "./dist/index.js",
-  "repository": "https://github.com/jindra12/redux-decorated.git",
+  "repository": "https://github.com/jindra12/intervals.git",
   "author": "Jan Jindráček",
   "license": "MIT",
   "scripts": {
