@@ -7,6 +7,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
     const less = (a: T, b: T) => hasInfinity(a, b) ? infinityIsMore(a, b, false) : isLessThan(a, b);
     const lessOrEqual = (a: T, b: T) => hasInfinity(a, b) ? infinityIsMore(a, b, true) : (isLessThan(a, b) || equals(a, b));
     const moreOrEqual = (a: T, b: T) => hasInfinity(a, b) ? infinityIsMore(b, a, true) : (isLessThan(b, a) || equals(a, b));
+    const safeEquals = (a: T, b: T) => a === infinity && b === infinity || (!hasInfinity(a, b) && equals(a, b));
     const getInfinity = (a: any, b: any) => a === infinity ? a : b;
     const getNotInfinity = (a: any, b: any) => a === infinity ? b : a;
     const infinityIsMore = (a: any, b: any, equal: boolean) => {
@@ -72,7 +73,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                     interval.current = nextValue;
                     return interval.it(iterator - 1);
                 }
-                if (equals(nextValue, interval.end)) {
+                if (safeEquals(nextValue, interval.end)) {
                     interval.current = nextValue;
                     return interval;
                 }
@@ -81,7 +82,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                     return interval;
                 }
             }
-            if (equals(interval.current, interval.end)) {
+            if (safeEquals(interval.current, interval.end)) {
                 interval.isDone = true;
                 return interval;
             }
@@ -186,7 +187,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             }
 
             const trueEnd = (interval.end === infinity || end || end as any === 0) ? end : interval.end;
-            const trueCompare = typeof compare === 'function' ? compare as (item: T) => boolean : (item: T) => equals(item, compare);
+            const trueCompare = typeof compare === 'function' ? compare as (item: T) => boolean : (item: T) => safeEquals(item, compare);
             const copyInterval = generalInterval(interval.start, trueEnd as any, interval.usedNext);
             return {
                 trueCompare,
@@ -238,7 +239,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                 nextEnd = to(interval.end);
             }
             if (!next) {
-                if (equals(nextEnd, infinity)) {
+                if (safeEquals(nextEnd, infinity)) {
                     throw Error('Cannot convert an infinite interval without next function');
                 }
                 return intervalCreator(interval.array().map(to));
@@ -296,7 +297,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             let toReturn: T[] = [];
             mapper(interval, (copied, stop, escape) => {
                 while (!copied.done() && !stop()) {
-                    if (equals(copied.val(), item)) {
+                    if (safeEquals(copied.val(), item)) {
                         escape();
                         toReturn = [copied.val()];
                     }
@@ -315,6 +316,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
         };
         interval.reset = () => {
             interval.current = interval.start;
+            interval.isDone = false;
             return interval;
         }
         interval.deep = () => intervalCreator(interval.array());
@@ -334,8 +336,47 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             [
                 ...interval.array(),
                 ...int.array(),
-            ].sort((a, b) => equals(a, b) ? 0 : (less(a, b) ? -1 : 1))
+            ].sort((a, b) => safeEquals(a, b) ? 0 : (less(a, b) ? -1 : 1))
         ) as any;
+        interval.pop = () => {
+            if (interval.isDone) {
+                return null;
+            }
+            const prevStart = interval.start;
+            interval.start = interval.usedNext(prevStart);
+            interval.current = interval.usedNext(prevStart);
+            return prevStart;
+        };
+        interval.push = item => {
+            if (safeEquals(item, infinity)) {
+                throw Error('Cannot push into infinite interval');
+            }
+            const prevEnd = interval.end;
+            const prevUsed = interval.usedNext;
+            interval.isDone = false;
+            interval.usedNext = current => {
+                if (safeEquals(current, prevEnd)) {
+                    return item;
+                }
+                return prevUsed(current);
+            };
+            interval.end = item;
+            return interval;
+        };
+        interval.unshift = item => {
+            const prevStart = interval.start;
+            const prevUsed = interval.usedNext;
+            interval.isDone = false;
+            interval.start = item;
+            interval.current = item; 
+            interval.usedNext = current => {
+                if (safeEquals(item, current)) {
+                    return prevStart;
+                }
+                return prevUsed(current);
+            }
+            return interval;
+        }
         return interval;
     };
 

@@ -1,6 +1,6 @@
 {
   "name": "interval-management",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "No dependency interval management library, able to work with numbers, string, Dates or special objects",
   "main": "index.js",
   "repository": "https://github.com/jindra12/intervals.git",

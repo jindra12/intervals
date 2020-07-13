@@ -159,6 +159,39 @@ Convert function can now be created without explicitly defining 'next' function.
 Next to a find function you can now find 'all'. Function will return an array of all elements matching a certain pattern.
 Will fail, similarly to 'find', if you apply it on an infinite interval without an 'end' item to finish the search.
 
+
+### Changes since 2.3.0:
+
+Added unshift, pop and push functions. Push will not work on infinite intervals.
+
+
+Also, changed the build to be targetted to ES5, fixed a bug in interval.reset() to reset done() function result
+
+
+Examples:
+
+```typescript
+
+expect(interval([1, 2, 3, 4]).unshift(0).array()).toEqual([0, 1, 2, 3, 4]);
+expect(interval(2, 8, n => n + 2).unshift(1).array()).toEqual([1, 2, 4, 6, 8]);
+expect(interval(0, Infinity, c => c + 1).unshift(-1).unshift(-2).has(-1)).toBe(true);
+
+expect(interval([1, 2, 3, 4]).push(5).array()).toEqual([1, 2, 3, 4, 5]);
+expect(interval(2, 8, n => n + 2).push(9).array()).toEqual([2, 4, 6, 8, 9]);
+
+expect(interval([1, 2, 3, 4]).pop()).toBe(1);
+expect(interval(2, 8, n => n + 2).pop()).toBe(2);
+
+const poppy = interval(1, 5, c => c + 2);
+poppy.pop();
+poppy.pop();
+expect(poppy.array()).toEqual([5]);
+const inf = interval(0, Infinity, c => c + 1);
+inf.pop();
+expect(inf.has(0)).toBe(false);
+
+```
+
 This library does NOT allow you to:
 
 1) Use array() for an explicitly infinite interval

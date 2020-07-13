@@ -145,4 +145,24 @@ describe("Can manipulate numeric intervals", () => {
         expect(interval([1, 2, 3, 4]).all(3)).toEqual([3]);
         expect(interval(1, Infinity).all(i => i < 10, 5)).toEqual([1, 2, 3, 4, 5]);
     });
+    test("Can unshift into intervals", () => {
+        expect(interval([1, 2, 3, 4]).unshift(0).array()).toEqual([0, 1, 2, 3, 4]);
+        expect(interval(2, 8, n => n + 2).unshift(1).array()).toEqual([1, 2, 4, 6, 8]);
+        expect(interval(0, Infinity, c => c + 1).unshift(-1).unshift(-2).has(-1)).toBe(true);
+    });
+    test("Can push into finite intervals", () => {
+        expect(interval([1, 2, 3, 4]).push(5).array()).toEqual([1, 2, 3, 4, 5]);
+        expect(interval(2, 8, n => n + 2).push(9).array()).toEqual([2, 4, 6, 8, 9]);
+    });
+    test("Can pop from intervals", () => {
+        expect(interval([1, 2, 3, 4]).pop()).toBe(1);
+        expect(interval(2, 8, n => n + 2).pop()).toBe(2);
+        const poppy = interval(1, 5, c => c + 2);
+        poppy.pop();
+        poppy.pop();
+        expect(poppy.array()).toEqual([5]);
+        const inf = interval(0, Infinity, c => c + 1);
+        inf.pop();
+        expect(inf.has(0)).toBe(false);
+    });
 });

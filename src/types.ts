@@ -173,6 +173,21 @@ export interface Interval<T = number> {
      * Will not work on infinite intervals
      */
     merge: (int: Interval<T>) => Interval<T>;
+
+    /**
+     * Remove and return first element of the interval. Will reset the current position inside the interval.
+     */
+    pop: () => T | null;
+
+    /**
+     * Pushes an element to the end of interval. Will fail on infinite intervals.
+     */
+    push: (item: T) => Interval<T>;
+
+    /**
+     * Pushes an element to the start of the interval. Will reset current position inside the interval.
+     */
+    unshift: (item: T) => Interval<T>;
 }
 
 /**
