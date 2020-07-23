@@ -192,6 +192,15 @@ expect(inf.has(0)).toBe(false);
 
 ```
 
+### Changes since 2.4.0
+
+Added .filter and .shuffle functions. Filter will work with infinite intervals, provided that at least one of the values will match to criteria.
+Shuffle will only work with finite intervals and it will generate values from interval in randomized order.
+
+
+Fixed a bug in .array() function where it returns a value even after .done() evaluates as true.
+
+
 This library does NOT allow you to:
 
 1) Use array() for an explicitly infinite interval

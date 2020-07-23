@@ -165,4 +165,14 @@ describe("Can manipulate numeric intervals", () => {
         inf.pop();
         expect(inf.has(0)).toBe(false);
     });
+    test("Can filter interval values", () => {
+        expect(interval(0, 5, c => c + 1).filter(c => c % 2 === 0).array()).toEqual([0, 2, 4]);
+        expect(
+            interval(0, Infinity, c => c + 1).filter(c => c % 2 === 1).diff(interval(6, Infinity, c => c + 1))!.array()
+        ).toEqual([1, 3, 5]);
+        expect(interval(0, 4).filter(c => c > 5).array()).toEqual([]);
+    });
+    test("Can shuffle interval values", () => {
+        expect(interval(1, 6).shuffle().sort()).toEqual([1, 2, 3, 4, 5, 6]);
+    });
 });

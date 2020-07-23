@@ -150,6 +150,9 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             if (interval.end === infinity) {
                 throw Error('Cannot count to Infinity!');
             }
+            if (interval.done()) {
+                return [];
+            }
             const aggregate: T[] = [];
             const copyInterval = interval.copy();
             while (!copyInterval.done()) {
@@ -377,6 +380,35 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             }
             return interval;
         }
+        interval.filter = by => {
+            const prevUsed = interval.usedNext;
+            interval.usedNext = current => {
+                const val = prevUsed(current);
+                if (by(val)) {
+                    return val;
+                }
+                return interval.usedNext(val);
+            }
+            let nextStart = interval.start;
+            while (!by(nextStart)) {
+                nextStart = prevUsed(nextStart);
+                if (less(interval.end, nextStart)) {
+                    interval.isDone = true;
+                    return interval;
+                }
+            }
+            interval.start = nextStart;
+            return interval;
+        };
+        interval.shuffle = () => {
+            const acc: T[] = [];
+            const orig = interval.array();
+            while (orig.length !== 0) {
+                const index = Math.floor(Math.random() * (orig.length - 1));
+                acc.push(...orig.splice(index, 1));
+            }
+            return acc;
+        };
         return interval;
     };
 

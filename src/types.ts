@@ -113,6 +113,22 @@ export interface Interval<T = number> {
      * Sorts an array of intervals. DOES NOT mutate the original array
      */
     sort: (intervals: Array<Interval<T>>) => Array<Interval<T>>;
+
+    /**
+     * Filters values in array by a selector. Will work on infinite intervals.
+     * When working with infinite interval,
+     * it is possible that this will cause an infinite loop,
+     * under these conditions: 
+     *      interval.start is NOT evaluated as true by the parameter AND
+     *      NO other value inside this infinite interval will evaluate as true
+     */
+    filter: (by: (item: T) => boolean) => Interval<T>;
+
+    /**
+     * Returns an array of values from interval in random order. Will fail on infinite intervals
+     */
+    shuffle: () => T[];
+
     /**
      * Splits interval into several smaller ones. Will fail on infinite intervals.
      * @param by When this function returns false, an interval with 'current' as its end will be created.
