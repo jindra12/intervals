@@ -140,8 +140,9 @@ export interface Interval<T = number> {
      * Returns an interval of type E, with start and end converted
      * @param to Function, which will be used to convert start, end and next of the interval
      * @param next How to get next element in line
+     * @param compare Use this function to redefine how the elements are compared. Only necessary when using object interval with defined next function
      */
-    convert: <E extends AllowedTypes>(to: (value: T) => E, next?: (item: E) => E) => Interval<E>;
+    convert: <E extends AllowedTypes>(to: (value: T) => E, next?: (item: E) => E, compare?: (a: E, b: E) => number) => Interval<E>;
 
     /**
      * Map function which can deal with infinite intervals. This function does not mutate interval.
@@ -241,6 +242,26 @@ export type Simplify<T> = T extends number
                             : (
                                 T extends object
                                     ? T
+                                    : never
+                            )
+                    )
+            )
+    );
+
+export type EndParam<T> = T extends number 
+    ? number
+    : (
+        T extends string
+            ? string | null
+            : (
+                T extends Date
+                    ? Date | null
+                    : (
+                        T extends []
+                            ? never
+                            : (
+                                T extends object
+                                    ? T | null
                                     : never
                             )
                     )

@@ -1,4 +1,4 @@
-import { AllowedTypes, IntervalType, Simplify, IsComparableByDefault } from "../types";
+import { AllowedTypes, IntervalType, Simplify, IsComparableByDefault, EndParam } from "../types";
 import { numberInterval } from "./numberInterval";
 import { stringInterval } from "./stringInterval";
 import { objectInterval } from "./objectInterval";
@@ -6,7 +6,7 @@ import { dateInterval } from "./dateInterval";
 
 export const interval = <T extends AllowedTypes = number>(
     start?: T,
-    end?: T extends Array<any> ? never : Simplify<T>,
+    end?: EndParam<T>,
     next?: T extends Array<any> ? never : (current: Simplify<T>) => Simplify<T>,
     compare?: IsComparableByDefault<T> extends false ? (a: Simplify<T>, b: Simplify<T>) => number : never,
 ): IntervalType<T> => {

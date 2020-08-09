@@ -1,11 +1,10 @@
-import { Interval, AllowedTypes, Simplify } from "../types";
+import { Interval, AllowedTypes } from "../types";
 import intervalCreator from "../index";
 
 export const createInterval = <T>(
     equals: (a: T, b: T) => boolean,
     isLessThan: (a: T, b: T) => boolean,
     infinity: any,
-    compare?: (a: Simplify<T>, b: Simplify<T>) => number,
 ) => {
     const min = (a: T, b: T) => hasInfinity(a, b) ? getInfinity(a, b) : (isLessThan(a, b) ? a : b);
     const max = (a: T, b: T) => hasInfinity(a, b) ? getNotInfinity(a, b) : isLessThan(a, b) ? b : a;
@@ -228,7 +227,7 @@ export const createInterval = <T>(
             }
             return aggregate;
         };
-        interval.convert = <E extends AllowedTypes>(to: (item: T) => E, next?: (item: E) => E) => {
+        interval.convert = <E extends AllowedTypes>(to: (item: T) => E, next?: (item: E) => E, compare?: (a: E, b: E) => number) => {
             let nextEnd: any;
             const nextStart: E = to(interval.start);
             if (interval.end === infinity) {

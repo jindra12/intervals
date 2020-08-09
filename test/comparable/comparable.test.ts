@@ -141,4 +141,15 @@ describe("Can manipulate custom object intervals intervals", () => {
             s => s.date.getTime(), s => s + 1000 * 60 * 60,
         ).array()).toEqual([comparable5.date.getTime(), comparable6.date.getTime(), comparable7.date.getTime()])
     });
+    test("Can convert to another object", () => {
+        expect(interval(comparable5, null, byHour, compare).convert(
+            comp => ({ value: comp.date }),
+            val => {
+                const nextDate = new Date(val.value);
+                nextDate.setHours(nextDate.getHours() + 1);
+                return { value: nextDate };
+            },
+            (a, b) => a.value.getTime() - b.value.getTime()
+        ).it(2).val().value.getTime()).toBe(comparable7.date.getTime());
+    });
 });
