@@ -23,8 +23,8 @@ const interval = interval(new Date(2019, 1, 1, 12), new Date(2019, 1, 1, 20), ad
 
 ```typescript
 
-expect(interval(2, 10).diff(interval(5, 10))[0].array()).toEqual([2, 3, 4, 5]);
-expect(interval(2, 4).diff(interval(5, 10))[0].array()).toEqual([2, 3, 4]);
+expect(interval(2, 10).diff(interval(5, 10))?.array()).toEqual([2, 3, 4, 5]);
+expect(interval(2, 4).diff(interval(5, 10))?.array()).toEqual([2, 3, 4]);
 
 expect(interval(2, 5).overlap(interval(5, 6))).toBe(true);
 expect(interval(2, 5).overlap(interval(7, 8))).toBe(false);
@@ -38,8 +38,8 @@ const byHour = (date: Date) => {
     return next;
 };
 
-expect(interval(date5, date7, byHour).concat(interval(date6, date8, byHour))[0].array()).toEqual([date5, date6, date7, date8]);
-expect(interval(date5, date6, byHour).concat(interval(date6, date7, byHour))[0].array()).toEqual([date5, date6, date7]);
+expect(interval(date5, date7, byHour).concat(interval(date6, date8, byHour))?.array()).toEqual([date5, date6, date7, date8]);
+expect(interval(date5, date6, byHour).concat(interval(date6, date7, byHour))?.array()).toEqual([date5, date6, date7]);
 
 ```
 
@@ -49,17 +49,15 @@ If you set undefined/Infinity on 'end' parameter of interval function, the inter
 Interval function does not have a sanity check for infinite generation (generator function never reaching end parameter).
 Type of interval will be decided based on 'typeof' and 'instance of' (for Date).
 
-Another important feature is the Comparable interface. If you need a custom object iterated over, you can do it like this:
+Another important feature is the custom comparing functions for object intervals
 
 ```typescript
 
-class TestData implements Comparable<TestData> {
+class TestData {
     public date: Date;
     constructor(date: Date) {
         this.date = date;
     }
-    public isLessThan = (test: TestData) => this.date.getTime() < test.date.getTime();
-    public equals = (test: TestData) => this.date.getTime() === test.date.getTime();
     public byHour = () => new TestData(this.byHourImpl(this.date));
     private byHourImpl = (date: Date) => {
         const next = new Date(date);
@@ -67,6 +65,11 @@ class TestData implements Comparable<TestData> {
         return next;
     };
 }
+
+const compare = (a: TestData, b: TestData) => a.date.getTime() - b.date.getTime();
+
+const i = interval(comparable1, comparable2, byHour, compare);
+expect(i.array()).dateEqual((i.copy().array() as TestData[]));
 
 ```
 
