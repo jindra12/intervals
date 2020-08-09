@@ -197,6 +197,10 @@ expect(inf.has(0)).toBe(false);
 Added .filter and .shuffle functions. Filter will work with infinite intervals, provided that at least one of the values will match to criteria.
 Shuffle will only work with finite intervals and it will generate values from interval in randomized order.
 
+### Changes since 3.0.0
+
+You don't need to define complicated classes implementing Comparable interface. Instead, there is now a fourth parameter on interval function,
+which lets you define how do you want objects to be compared. This parameter is only accessible when needed - e.g. when comparing objects.
 
 Fixed a bug in .array() function where it returns a value even after .done() evaluates as true.
 

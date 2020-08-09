@@ -206,15 +206,7 @@ export interface Interval<T = number> {
     unshift: (item: T) => Interval<T>;
 }
 
-/**
- * Comparison interface, needs to be implemented in order for object intervals to work
- */
-interface IComparable<T> {
-    equals: (item: T) => boolean;
-    isLessThan: (item: T) => boolean;
-}
-
-export type AllowedTypes = string | number | symbol | Comparable<any> | Date | boolean;
+export type AllowedTypes = string | number | symbol | object | Date | boolean;
 export type IntervalType<T> = T extends number 
     ? Interval<number> 
     : (
@@ -224,20 +216,53 @@ export type IntervalType<T> = T extends number
                 T extends Date
                     ? Interval<Date>
                     : (
-                        T extends Comparable<T>
-                            ? Interval<Comparable<T>>
+                        T extends (infer U)[]
+                            ? Interval<U>
                             : (
-                                T extends (infer U)[]
-                                    ? Interval<U>
+                                T extends object
+                                    ? Interval<T>
                                     : never
                             )
                     )
             )
     );
 
-export interface InnerComparable {
-    equals: <T extends InnerComparable>(item: T) => boolean;
-    isLessThan: <T extends InnerComparable>(item: T) => boolean;
-}
+export type Simplify<T> = T extends number 
+    ? number 
+    : (
+        T extends string
+            ? string
+            : (
+                T extends Date
+                    ? Date
+                    : (
+                        T extends (infer U)[]
+                            ? U
+                            : (
+                                T extends object
+                                    ? T
+                                    : never
+                            )
+                    )
+            )
+    );
 
-export type Comparable<T> = T & IComparable<T>;
+export type IsComparableByDefault<T> = T extends number 
+    ? true 
+    : (
+        T extends string
+            ? true
+            : (
+                T extends Date
+                    ? true
+                    : (
+                        T extends []
+                            ? true
+                            : (
+                                T extends object
+                                    ? false
+                                    : never
+                            )
+                    )
+            )
+    );

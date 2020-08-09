@@ -1,7 +1,12 @@
-import { Interval, AllowedTypes } from "../types";
+import { Interval, AllowedTypes, Simplify } from "../types";
 import intervalCreator from "../index";
 
-export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (a: T, b: T) => boolean, infinity: any) => {
+export const createInterval = <T>(
+    equals: (a: T, b: T) => boolean,
+    isLessThan: (a: T, b: T) => boolean,
+    infinity: any,
+    compare?: (a: Simplify<T>, b: Simplify<T>) => number,
+) => {
     const min = (a: T, b: T) => hasInfinity(a, b) ? getInfinity(a, b) : (isLessThan(a, b) ? a : b);
     const max = (a: T, b: T) => hasInfinity(a, b) ? getNotInfinity(a, b) : isLessThan(a, b) ? b : a;
     const less = (a: T, b: T) => hasInfinity(a, b) ? infinityIsMore(a, b, false) : isLessThan(a, b);
@@ -171,12 +176,11 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
             const end = items[items.length - 1];
             items.forEach((item, i) => {
                 const next = items[i + 1];
-                if (!split(item, next, i)) {
-                    intervals.push(generalInterval(start, item, interval.usedNext));
-                    start = next;
-                }
                 if (i === items.length - 1) {
                     intervals.push(generalInterval(start, end, interval.usedNext));
+                } else if (!split(item, next, i)) {
+                    intervals.push(generalInterval(start, item, interval.usedNext));
+                    start = next;
                 }
             });
             return intervals;
@@ -247,7 +251,7 @@ export const createInterval = <T>(equals: (a: T, b: T) => boolean, isLessThan: (
                 }
                 return intervalCreator(interval.array().map(to));
             }
-            const converted = intervalCreator(nextStart, nextEnd, next) as Interval<E>;
+            const converted = intervalCreator(nextStart, nextEnd, next, compare as any) as Interval<E>;
             converted.current = to(interval.current);
             return converted;
         }

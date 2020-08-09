@@ -1,10 +1,15 @@
-import { Comparable, AllowedTypes, IntervalType } from "../types";
+import { AllowedTypes, IntervalType, Simplify, IsComparableByDefault } from "../types";
 import { numberInterval } from "./numberInterval";
 import { stringInterval } from "./stringInterval";
 import { objectInterval } from "./objectInterval";
 import { dateInterval } from "./dateInterval";
 
-export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, next?: (current: T) => T): IntervalType<T> => {
+export const interval = <T extends AllowedTypes = number>(
+    start?: T,
+    end?: T extends Array<any> ? never : Simplify<T>,
+    next?: T extends Array<any> ? never : (current: Simplify<T>) => Simplify<T>,
+    compare?: IsComparableByDefault<T> extends false ? (a: Simplify<T>, b: Simplify<T>) => number : never,
+): IntervalType<T> => {
     if (!start && !end && !next) {
         return numberInterval(0, Infinity, current => current + 1) as any;
     }
@@ -42,10 +47,10 @@ export const interval = <T extends AllowedTypes = number>(start?: T, end?: T, ne
                 if (start instanceof Date) {
                     return dateInterval(start, (end as any) || null, next as any || (current => new Date(current.getTime() + 1))) as any;
                 }
-                if (!next) {
+                if (!next || !compare) {
                     throw Error('Cannot create non-date object interval without knowing how to generate next item');
                 }
-                return objectInterval(start as Comparable<any>, (end as any) || null, next as any) as any;
+                return objectInterval(compare)(start as any, (end as any) || null, next as any) as any;
             case 'boolean':
                 return numberInterval(start as number, (end as any) || true, next as any || (_ => true)) as any;
         }
